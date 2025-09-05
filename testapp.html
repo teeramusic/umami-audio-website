@@ -225,7 +225,7 @@
         <!-- Step 3: Polling Status -->
         <div class="step" id="step3" style="display: none;">
             <h3>Step 3: Polling for Authentication</h3>
-            <p>Desktop app polls the server every 5 seconds to check if user completed authentication.</p>
+            <p>Desktop app polls the server to check if user completed authentication.</p>
             <div id="pollingStatus"></div>
             <div id="pollCount"></div>
             <div id="timeRemaining"></div>
@@ -265,6 +265,7 @@
         let accessToken = null;
         let refreshToken = null;
         let userInfo = null;
+        let pollingIntervalSeconds = 5; // Default to 5 seconds, will be updated from server response
         
         // Logging function
         function log(message, type = 'info') {
@@ -313,6 +314,7 @@
                 verificationUri = data.verification_uri;
                 verificationUriComplete = data.verification_uri_complete;
                 expiresAt = Date.now() + (data.expires_in * 1000);
+                pollingIntervalSeconds = data.interval || 5; // Use server-provided interval
                 
                 // Update UI
                 document.getElementById('step1Status').innerHTML = 
@@ -358,10 +360,10 @@
             document.getElementById('stopPolling').style.display = 'inline-block';
             pollCount = 0;
             
-            log('🔄 Starting polling for authentication completion...', 'info');
+            log(`🔄 Starting polling for authentication completion every ${pollingIntervalSeconds} seconds...`, 'info');
             
-            // Start polling every 5 seconds
-            pollingInterval = setInterval(pollForToken, 5000);
+            // Start polling using server-provided interval
+            pollingInterval = setInterval(pollForToken, pollingIntervalSeconds * 1000);
             
             // Update countdown timer
             updateCountdown();
