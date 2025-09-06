@@ -329,7 +329,13 @@
         }
 
         function redirectToDashboard() {
-            window.location.href = `${CONFIG.FRONTEND_URL}/dashboard/`;
+            if (isAuthenticated) {
+                // If authenticated, go to dashboard
+                window.location.href = `${CONFIG.FRONTEND_URL}/dashboard/`;
+            } else {
+                // If not authenticated, go to login page
+                window.location.href = `${CONFIG.FRONTEND_URL}/dashboard/login`;
+            }
         }
 
         function downloadFile(platform) {
