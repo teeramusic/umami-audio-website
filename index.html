@@ -322,8 +322,44 @@
             }
         }
 
+        // Check if this is a dashboard URL that should be redirected
+        function checkForDashboardRedirect() {
+            const currentPath = window.location.pathname + window.location.search;
+            
+            // Check for malformed URLs like /?/dashboard/...
+            if (currentPath.includes('/dashboard/') || window.location.search.includes('/dashboard/')) {
+                // Extract the dashboard path
+                let dashboardPath = '';
+                
+                if (currentPath.includes('?/dashboard/')) {
+                    // Handle malformed URL like /?/dashboard/device&code=...
+                    dashboardPath = currentPath.split('?/dashboard/')[1];
+                    // Fix parameter encoding
+                    dashboardPath = dashboardPath.replace(/~and~/g, '&');
+                } else if (currentPath.includes('/dashboard/')) {
+                    // Handle normal dashboard URLs
+                    dashboardPath = currentPath.split('/dashboard/')[1];
+                }
+                
+                if (dashboardPath) {
+                    // Redirect to proper dashboard URL
+                    const newUrl = `${CONFIG.FRONTEND_URL}/dashboard/${dashboardPath}`;
+                    console.log('Redirecting malformed URL to:', newUrl);
+                    window.location.href = newUrl;
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
         // Initialize auth check on page load
         document.addEventListener('DOMContentLoaded', function() {
+            // First check if this should be redirected to dashboard
+            if (checkForDashboardRedirect()) {
+                return; // Don't continue if redirecting
+            }
+            
             checkAuthStatus();
 
             // Add scroll-based animations
