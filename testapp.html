@@ -423,12 +423,12 @@
                     },
                     body: JSON.stringify({
                         client_id: CLIENT_ID,
-                        scope: 'calibration upload profile'
+                        scope: 'profile'
                     })
                 });
                 
                 log(`📤 POST ${API_BASE}/api/auth/device/code`, 'request');
-                log(`📤 Request Body: ${JSON.stringify({client_id: CLIENT_ID, scope: 'calibration upload profile'}, null, 2)}`, 'request');
+                log(`📤 Request Body: ${JSON.stringify({client_id: CLIENT_ID, scope: 'profile'}, null, 2)}`, 'request');
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
