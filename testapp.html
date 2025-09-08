@@ -285,6 +285,7 @@
                 <li><strong>AJAX Integration:</strong> Frontend uses AJAX calls instead of form submissions</li>
                 <li><strong>Static Site Compatible:</strong> Works with GitHub Pages static hosting</li>
                 <li><strong>Enhanced Error Handling:</strong> Comprehensive error codes and descriptions</li>
+                <li><strong>6-Character User Codes:</strong> Simplified format without dashes (e.g., ABCD23)</li>
             </ul>
         </div>
         
@@ -304,7 +305,7 @@
             <p><strong>Instructions for User:</strong></p>
             <ol>
                 <li>Go to the verification URL below</li>
-                <li>Enter the code shown above (or use auto-submit)</li>
+                <li>Enter the 6-character code shown above (or use auto-submit)</li>
                 <li>Complete authentication (or auto-complete if already logged in)</li>
             </ol>
             <div class="url-display">
@@ -458,7 +459,7 @@
                 document.getElementById('requestCode').disabled = true;
                 
                 log(`✅ Device code generated: ${deviceCode.substring(0, 20)}...`, 'success');
-                log(`👤 User code: ${userCode}`, 'info');
+                log(`👤 User code (6 chars): ${userCode}`, 'info');
                 log(`🌐 Verification URL: ${verificationUriComplete}`, 'info');
                 
             } catch (error) {
