@@ -176,9 +176,9 @@
         <!-- Authentication Section -->
         <div class="auth-section">
             <h3>🔐 Authentication Required</h3>
-            <p>All job endpoints require authentication. Please log in first or provide a valid Bearer token.</p>
+            <p>All job endpoints require authentication. The page will automatically use your token from the main application if you're logged in, or you can provide a Bearer token manually.</p>
             <div class="input-group">
-                <label for="authToken">Bearer Token:</label>
+                <label for="authToken">Bearer Token (if not logged in to main app):</label>
                 <input type="text" id="authToken" placeholder="Enter your Bearer token here..." />
             </div>
             <button class="test-button" onclick="testAuth()">Test Authentication</button>
@@ -477,9 +477,16 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
         let pollingInterval = null;
 
         function getAuthHeaders() {
-            const token = document.getElementById('authToken').value;
+            // First try to get token from localStorage (from main app)
+            let token = localStorage.getItem('access_token');
+            
+            // If not found in localStorage, try the input field
             if (!token) {
-                throw new Error('Please provide a Bearer token');
+                token = document.getElementById('authToken').value;
+            }
+            
+            if (!token) {
+                throw new Error('No authentication token found. Please log in to the main application first or provide a Bearer token manually.');
             }
             return {
                 'Authorization': `Bearer ${token}`,
@@ -543,10 +550,16 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
                     formData.append('file', fileInput.files[0]);
                 }
 
+                // Get token using the same logic as other functions
+                const token = localStorage.getItem('access_token') || document.getElementById('authToken').value;
+                if (!token) {
+                    throw new Error('No authentication token found. Please log in to the main application first or provide a Bearer token manually.');
+                }
+
                 const response = await fetch(`${API_BASE}/api/jobs/`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${document.getElementById('authToken').value}`
+                        'Authorization': `Bearer ${token}`
                     },
                     body: formData
                 });
@@ -669,10 +682,27 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
 
         // Auto-test authentication on page load
         window.addEventListener('load', () => {
-            const token = localStorage.getItem('authToken');
+            const token = localStorage.getItem('access_token');
             if (token) {
-                document.getElementById('authToken').value = token;
+                // Hide the manual token input since we have one from the main app
+                document.getElementById('authToken').style.display = 'none';
+                document.querySelector('label[for="authToken"]').style.display = 'none';
+                document.querySelector('button[onclick="testAuth()"]').style.display = 'none';
+                
+                // Update the auth section to show we're using the main app token
+                const authSection = document.querySelector('.auth-section');
+                authSection.innerHTML = `
+                    <h3>🔐 Authentication Status</h3>
+                    <p>Using authentication token from main application.</p>
+                    <button class="test-button" onclick="testAuth()">Test Authentication</button>
+                    <span id="authStatus"></span>
+                `;
+                
+                // Auto-test the authentication
                 testAuth();
+            } else {
+                // Show manual token input if no token from main app
+                document.getElementById('authToken').placeholder = 'No token found from main app. Please log in first or enter token manually.';
             }
         });
 
