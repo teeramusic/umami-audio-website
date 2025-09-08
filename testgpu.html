@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPU Job Endpoints Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .endpoint-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        .endpoint-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .endpoint-method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+        .method-post { background-color: #27ae60; color: white; }
+        .method-get { background-color: #3498db; color: white; }
+        .method-delete { background-color: #e74c3c; color: white; }
+        .endpoint-url {
+            font-family: 'Courier New', monospace;
+            background-color: #ecf0f1;
+            padding: 8px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .request-response {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        .request, .response {
+            background-color: white;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .request h4, .response h4 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .json-block {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .test-controls {
+            margin-top: 15px;
+        }
+        .test-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .test-button:hover {
+            background-color: #2980b9;
+        }
+        .test-button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .input-group input, .input-group textarea, .input-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .input-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .file-input {
+            margin-top: 10px;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .result.success {
+            background-color: #d5f4e6;
+            border: 1px solid #27ae60;
+            color: #27ae60;
+        }
+        .result.error {
+            background-color: #fadbd8;
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+        }
+        .auth-section {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .auth-section h3 {
+            margin-top: 0;
+            color: #856404;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-connected { background-color: #27ae60; }
+        .status-disconnected { background-color: #e74c3c; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 GPU Job Endpoints Test Interface</h1>
+        
+        <!-- Authentication Section -->
+        <div class="auth-section">
+            <h3>🔐 Authentication Required</h3>
+            <p>All job endpoints require authentication. Please log in first or provide a valid Bearer token.</p>
+            <div class="input-group">
+                <label for="authToken">Bearer Token:</label>
+                <input type="text" id="authToken" placeholder="Enter your Bearer token here..." />
+            </div>
+            <button class="test-button" onclick="testAuth()">Test Authentication</button>
+            <span id="authStatus"></span>
+        </div>
+
+        <!-- POST /api/jobs/ - Create Job -->
+        <div class="endpoint-section">
+            <div class="endpoint-title">
+                <span class="endpoint-method method-post">POST</span>
+                <span>/api/jobs/</span>
+            </div>
+            <div class="endpoint-url">POST https://udev-backend.teeramusic.com:15351/api/jobs/</div>
+            <div class="description">
+                <strong>Create a new GPU processing job</strong><br>
+                Creates a job record in the database, handles file uploads, and queues the job for GPU processing.
+            </div>
+            
+            <div class="request-response">
+                <div class="request">
+                    <h4>Request Body (JSON)</h4>
+                    <div class="json-block">{
+  "title": "My GPU Processing Job",
+  "description": "Process audio file for calibration",
+  "parameters": {
+    "quality": "high",
+    "format": "wav"
+  },
+  "priority": 0
+}</div>
+                    <h4>Form Data (File Upload)</h4>
+                    <div class="json-block">file: [audio file] (optional)</div>
+                </div>
+                <div class="response">
+                    <h4>Response (JobResponse)</h4>
+                    <div class="json-block">{
+  "id": 123,
+  "job_id": "uuid-string",
+  "title": "My GPU Processing Job",
+  "description": "Process audio file for calibration",
+  "status": "pending",
+  "progress": 0.0,
+  "priority": 0,
+  "parameters": {...},
+  "result": null,
+  "error_message": null,
+  "created_at": "2024-01-01T12:00:00Z",
+  "updated_at": "2024-01-01T12:00:00Z",
+  "started_at": null,
+  "completed_at": null,
+  "estimated_duration": null,
+  "actual_duration": null
+}</div>
+                </div>
+            </div>
+            
+            <div class="test-controls">
+                <div class="input-group">
+                    <label for="jobTitle">Job Title:</label>
+                    <input type="text" id="jobTitle" value="Test GPU Job" />
+                </div>
+                <div class="input-group">
+                    <label for="jobDescription">Description:</label>
+                    <input type="text" id="jobDescription" value="Test job for GPU processing" />
+                </div>
+                <div class="input-group">
+                    <label for="jobParameters">Parameters (JSON):</label>
+                    <textarea id="jobParameters">{"quality": "high", "format": "wav"}</textarea>
+                </div>
+                <div class="input-group">
+                    <label for="jobPriority">Priority:</label>
+                    <select id="jobPriority">
+                        <option value="0">Normal (0)</option>
+                        <option value="1">High (1)</option>
+                        <option value="-1">Low (-1)</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="jobFile">File Upload (optional):</label>
+                    <input type="file" id="jobFile" class="file-input" accept=".wav,.mp3,.txt,.zip" />
+                </div>
+                <button class="test-button" onclick="createJob()">Create Job</button>
+                <div id="createJobResult" class="result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- GET /api/jobs/ - Get All Jobs -->
+        <div class="endpoint-section">
+            <div class="endpoint-title">
+                <span class="endpoint-method method-get">GET</span>
+                <span>/api/jobs/</span>
+            </div>
+            <div class="endpoint-url">GET https://udev-backend.teeramusic.com:15351/api/jobs/?skip=0&limit=100</div>
+            <div class="description">
+                <strong>Get all jobs for current user</strong><br>
+                Returns a paginated list of jobs belonging to the authenticated user, ordered by creation date.
+            </div>
+            
+            <div class="request-response">
+                <div class="request">
+                    <h4>Query Parameters</h4>
+                    <div class="json-block">skip: 0 (optional, default: 0)
+limit: 100 (optional, default: 100)</div>
+                </div>
+                <div class="response">
+                    <h4>Response (JobResponse[])</h4>
+                    <div class="json-block">[
+  {
+    "id": 123,
+    "job_id": "uuid-string",
+    "title": "My GPU Processing Job",
+    "status": "pending",
+    "progress": 0.0,
+    "created_at": "2024-01-01T12:00:00Z",
+    ...
+  }
+]</div>
+                </div>
+            </div>
+            
+            <div class="test-controls">
+                <div class="input-group">
+                    <label for="jobsSkip">Skip:</label>
+                    <input type="number" id="jobsSkip" value="0" min="0" />
+                </div>
+                <div class="input-group">
+                    <label for="jobsLimit">Limit:</label>
+                    <input type="number" id="jobsLimit" value="100" min="1" max="1000" />
+                </div>
+                <button class="test-button" onclick="getAllJobs()">Get All Jobs</button>
+                <div id="getAllJobsResult" class="result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- GET /api/jobs/{job_id} - Get Specific Job -->
+        <div class="endpoint-section">
+            <div class="endpoint-title">
+                <span class="endpoint-method method-get">GET</span>
+                <span>/api/jobs/{job_id}</span>
+            </div>
+            <div class="endpoint-url">GET https://udev-backend.teeramusic.com:15351/api/jobs/{job_id}</div>
+            <div class="description">
+                <strong>Get specific job details</strong><br>
+                Returns detailed information about a specific job by its job_id. Only returns jobs belonging to the authenticated user.
+            </div>
+            
+            <div class="request-response">
+                <div class="request">
+                    <h4>Path Parameters</h4>
+                    <div class="json-block">job_id: string (required)
+Example: "550e8400-e29b-41d4-a716-446655440000"</div>
+                </div>
+                <div class="response">
+                    <h4>Response (JobResponse)</h4>
+                    <div class="json-block">{
+  "id": 123,
+  "job_id": "550e8400-e29b-41d4-a716-446655440000",
+  "title": "My GPU Processing Job",
+  "description": "Process audio file for calibration",
+  "status": "completed",
+  "progress": 100.0,
+  "result": {
+    "output_file": "processed_audio.wav",
+    "processing_time": 45.2
+  },
+  "created_at": "2024-01-01T12:00:00Z",
+  "completed_at": "2024-01-01T12:01:00Z"
+}</div>
+                </div>
+            </div>
+            
+            <div class="test-controls">
+                <div class="input-group">
+                    <label for="specificJobId">Job ID:</label>
+                    <input type="text" id="specificJobId" placeholder="Enter job ID..." />
+                </div>
+                <button class="test-button" onclick="getSpecificJob()">Get Job Details</button>
+                <div id="getSpecificJobResult" class="result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- GET /api/jobs/{job_id}/status - Get Job Status -->
+        <div class="endpoint-section">
+            <div class="endpoint-title">
+                <span class="endpoint-method method-get">GET</span>
+                <span>/api/jobs/{job_id}/status</span>
+            </div>
+            <div class="endpoint-url">GET https://udev-backend.teeramusic.com:15351/api/jobs/{job_id}/status</div>
+            <div class="description">
+                <strong>Get job status for polling</strong><br>
+                Returns lightweight job status information, perfect for polling to check job progress without fetching full job details.
+            </div>
+            
+            <div class="request-response">
+                <div class="request">
+                    <h4>Path Parameters</h4>
+                    <div class="json-block">job_id: string (required)</div>
+                </div>
+                <div class="response">
+                    <h4>Response (JobStatus)</h4>
+                    <div class="json-block">{
+  "job_id": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "processing",
+  "progress": 75.5,
+  "error_message": null
+}</div>
+                </div>
+            </div>
+            
+            <div class="test-controls">
+                <div class="input-group">
+                    <label for="statusJobId">Job ID:</label>
+                    <input type="text" id="statusJobId" placeholder="Enter job ID..." />
+                </div>
+                <button class="test-button" onclick="getJobStatus()">Get Job Status</button>
+                <button class="test-button" onclick="startPolling()">Start Polling (5s)</button>
+                <button class="test-button" onclick="stopPolling()">Stop Polling</button>
+                <div id="getJobStatusResult" class="result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- GET /api/jobs/queue/status - Get Queue Status -->
+        <div class="endpoint-section">
+            <div class="endpoint-title">
+                <span class="endpoint-method method-get">GET</span>
+                <span>/api/jobs/queue/status</span>
+            </div>
+            <div class="endpoint-url">GET https://udev-backend.teeramusic.com:15351/api/jobs/queue/status</div>
+            <div class="description">
+                <strong>Get current queue status</strong><br>
+                Returns information about the current job queue, including queue length, processing jobs, and estimated wait times.
+            </div>
+            
+            <div class="request-response">
+                <div class="request">
+                    <h4>No Parameters</h4>
+                    <div class="json-block">No request body or query parameters</div>
+                </div>
+                <div class="response">
+                    <h4>Response (QueueInfo)</h4>
+                    <div class="json-block">{
+  "queue_length": 5,
+  "processing_jobs": 2,
+  "total_jobs": 7,
+  "estimated_wait_time": "3-5 minutes",
+  "gpu_available": true,
+  "last_updated": "2024-01-01T12:00:00Z"
+}</div>
+                </div>
+            </div>
+            
+            <div class="test-controls">
+                <button class="test-button" onclick="getQueueStatus()">Get Queue Status</button>
+                <div id="getQueueStatusResult" class="result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- DELETE /api/jobs/{job_id} - Cancel Job -->
+        <div class="endpoint-section">
+            <div class="endpoint-title">
+                <span class="endpoint-method method-delete">DELETE</span>
+                <span>/api/jobs/{job_id}</span>
+            </div>
+            <div class="endpoint-url">DELETE https://udev-backend.teeramusic.com:15351/api/jobs/{job_id}</div>
+            <div class="description">
+                <strong>Cancel a job</strong><br>
+                Cancels a job if it's in pending or processing status. Cannot cancel completed, failed, or already cancelled jobs.
+            </div>
+            
+            <div class="request-response">
+                <div class="request">
+                    <h4>Path Parameters</h4>
+                    <div class="json-block">job_id: string (required)</div>
+                </div>
+                <div class="response">
+                    <h4>Response</h4>
+                    <div class="json-block">{
+  "message": "Job cancelled successfully"
+}</div>
+                </div>
+            </div>
+            
+            <div class="test-controls">
+                <div class="input-group">
+                    <label for="cancelJobId">Job ID:</label>
+                    <input type="text" id="cancelJobId" placeholder="Enter job ID to cancel..." />
+                </div>
+                <button class="test-button" onclick="cancelJob()">Cancel Job</button>
+                <div id="cancelJobResult" class="result" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://udev-backend.teeramusic.com:15351';
+        let pollingInterval = null;
+
+        function getAuthHeaders() {
+            const token = document.getElementById('authToken').value;
+            if (!token) {
+                throw new Error('Please provide a Bearer token');
+            }
+            return {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
+        }
+
+        function showResult(elementId, data, isError = false) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.className = `result ${isError ? 'error' : 'success'}`;
+            element.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+        }
+
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        ...getAuthHeaders(),
+                        ...options.headers
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${data.detail || data.message || 'Unknown error'}`);
+                }
+                
+                return data;
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        async function testAuth() {
+            try {
+                await makeRequest(`${API_BASE}/api/me`);
+                document.getElementById('authStatus').innerHTML = 
+                    '<span class="status-indicator status-connected"></span>Authenticated';
+                document.getElementById('authStatus').style.color = '#27ae60';
+            } catch (error) {
+                document.getElementById('authStatus').innerHTML = 
+                    '<span class="status-indicator status-disconnected"></span>Authentication Failed';
+                document.getElementById('authStatus').style.color = '#e74c3c';
+                showResult('authStatus', error.message, true);
+            }
+        }
+
+        async function createJob() {
+            try {
+                const formData = new FormData();
+                formData.append('title', document.getElementById('jobTitle').value);
+                formData.append('description', document.getElementById('jobDescription').value);
+                formData.append('parameters', document.getElementById('jobParameters').value);
+                formData.append('priority', document.getElementById('jobPriority').value);
+                
+                const fileInput = document.getElementById('jobFile');
+                if (fileInput.files[0]) {
+                    formData.append('file', fileInput.files[0]);
+                }
+
+                const response = await fetch(`${API_BASE}/api/jobs/`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${document.getElementById('authToken').value}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${data.detail || data.message || 'Unknown error'}`);
+                }
+
+                showResult('createJobResult', data);
+                
+                // Auto-fill job ID fields with the created job ID
+                document.getElementById('specificJobId').value = data.job_id;
+                document.getElementById('statusJobId').value = data.job_id;
+                document.getElementById('cancelJobId').value = data.job_id;
+                
+            } catch (error) {
+                showResult('createJobResult', error.message, true);
+            }
+        }
+
+        async function getAllJobs() {
+            try {
+                const skip = document.getElementById('jobsSkip').value;
+                const limit = document.getElementById('jobsLimit').value;
+                const data = await makeRequest(`${API_BASE}/api/jobs/?skip=${skip}&limit=${limit}`);
+                showResult('getAllJobsResult', data);
+            } catch (error) {
+                showResult('getAllJobsResult', error.message, true);
+            }
+        }
+
+        async function getSpecificJob() {
+            try {
+                const jobId = document.getElementById('specificJobId').value;
+                if (!jobId) {
+                    throw new Error('Please enter a job ID');
+                }
+                const data = await makeRequest(`${API_BASE}/api/jobs/${jobId}`);
+                showResult('getSpecificJobResult', data);
+            } catch (error) {
+                showResult('getSpecificJobResult', error.message, true);
+            }
+        }
+
+        async function getJobStatus() {
+            try {
+                const jobId = document.getElementById('statusJobId').value;
+                if (!jobId) {
+                    throw new Error('Please enter a job ID');
+                }
+                const data = await makeRequest(`${API_BASE}/api/jobs/${jobId}/status`);
+                showResult('getJobStatusResult', data);
+            } catch (error) {
+                showResult('getJobStatusResult', error.message, true);
+            }
+        }
+
+        function startPolling() {
+            const jobId = document.getElementById('statusJobId').value;
+            if (!jobId) {
+                alert('Please enter a job ID first');
+                return;
+            }
+            
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+            }
+            
+            pollingInterval = setInterval(async () => {
+                try {
+                    const data = await makeRequest(`${API_BASE}/api/jobs/${jobId}/status`);
+                    showResult('getJobStatusResult', data);
+                    
+                    // Stop polling if job is completed, failed, or cancelled
+                    if (['completed', 'failed', 'cancelled'].includes(data.status)) {
+                        stopPolling();
+                    }
+                } catch (error) {
+                    showResult('getJobStatusResult', error.message, true);
+                    stopPolling();
+                }
+            }, 5000);
+            
+            showResult('getJobStatusResult', 'Started polling every 5 seconds...');
+        }
+
+        function stopPolling() {
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+                showResult('getJobStatusResult', 'Polling stopped.');
+            }
+        }
+
+        async function getQueueStatus() {
+            try {
+                const data = await makeRequest(`${API_BASE}/api/jobs/queue/status`);
+                showResult('getQueueStatusResult', data);
+            } catch (error) {
+                showResult('getQueueStatusResult', error.message, true);
+            }
+        }
+
+        async function cancelJob() {
+            try {
+                const jobId = document.getElementById('cancelJobId').value;
+                if (!jobId) {
+                    throw new Error('Please enter a job ID');
+                }
+                const data = await makeRequest(`${API_BASE}/api/jobs/${jobId}`, {
+                    method: 'DELETE'
+                });
+                showResult('cancelJobResult', data);
+            } catch (error) {
+                showResult('cancelJobResult', error.message, true);
+            }
+        }
+
+        // Auto-test authentication on page load
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('authToken');
+            if (token) {
+                document.getElementById('authToken').value = token;
+                testAuth();
+            }
+        });
+
+        // Save token to localStorage when changed
+        document.getElementById('authToken').addEventListener('input', (e) => {
+            localStorage.setItem('authToken', e.target.value);
+        });
+    </script>
+</body>
+</html>
