@@ -246,14 +246,20 @@
             
             <div class="request-response">
                 <div class="request">
-                    <h4>Request Body (JSON)</h4>
+                    <h4>Form Data</h4>
+                    <div class="json-block">data: JSON string (required)
+file: [audio file] (required for upload/replace)</div>
+                    <h4>Data Field JSON Structure</h4>
                     <div class="json-block">{
   "job_id": "uuid-string",
-  "task": "upload|replace|delete|cancel",
-  "target": "filename.wav"  // required for upload/replace/delete
+  "task": "upload|replace|delete|cancel|ready",
+  "target": "filename.wav",  // required for upload/replace/delete
+  "speaker_names": [...],  // required for ready
+  "is_subwoofer": [...],  // required for ready
+  "bitdepth": "int24",  // required for ready
+  "sampling_rate": 96000,  // required for ready
+  "sweep_params": {...}  // required for ready
 }</div>
-                    <h4>Form Data (File Upload)</h4>
-                    <div class="json-block">file: [audio file] (required for upload/replace)</div>
                 </div>
                 <div class="response">
                     <h4>Response</h4>
@@ -291,25 +297,28 @@
                     <input type="file" id="updateFile" class="file-input" accept=".wav,.wv,.flac" />
                 </div>
                 <button class="test-button" onclick="updateJob()">Update Job</button>
+                <button class="test-button" onclick="checkJobStatusBeforeUpdate()">Check Job Status First</button>
                 <div id="updateJobResult" class="result" style="display: none;"></div>
             </div>
         </div>
 
-        <!-- POST /api/jobs/ready - Mark Job Ready -->
+        <!-- POST /api/jobs/update - Mark Job Ready (ready task) -->
         <div class="endpoint-section">
             <div class="endpoint-title">
                 <span class="endpoint-method method-post">POST</span>
-                <span>/api/jobs/ready</span>
+                <span>/api/jobs/update (ready task)</span>
             </div>
-            <div class="endpoint-url">POST https://udev-backend.teeramusic.com:15351/api/jobs/ready</div>
+            <div class="endpoint-url">POST https://udev-backend.teeramusic.com:15351/api/jobs/update</div>
             <div class="description">
                 <strong>Mark job as ready for processing</strong><br>
-                Submit job with metadata for GPU processing. Job must have files and valid metadata.
+                Submit job with metadata for GPU processing. Job must have files and valid metadata. Use task="ready" in the data field.
             </div>
             
             <div class="request-response">
                 <div class="request">
-                    <h4>Request Body (JSON)</h4>
+                    <h4>Form Data</h4>
+                    <div class="json-block">data: JSON string (required)</div>
+                    <h4>Data Field JSON Structure</h4>
                     <div class="json-block">{
   "job_id": "uuid-string",
   "task": "ready",
@@ -871,14 +880,33 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
                     throw new Error('Please select a file to upload');
                 }
                 
-                const formData = new FormData();
-                formData.append('job_id', jobId);
-                formData.append('task', task);
+                // Prepare JSON data
+                const jsonData = {
+                    job_id: jobId,
+                    task: task
+                };
+                
                 if (target) {
-                    formData.append('target', target);
+                    jsonData.target = target;
                 }
+                
+                // Debug: Log the request data
+                console.log('Request data:', jsonData);
+                console.log('Task:', task);
+                
+                const formData = new FormData();
+                const dataString = JSON.stringify(jsonData);
+                console.log('Data string being sent:', dataString);
+                formData.append('data', dataString);
+                
                 if (fileInput.files[0]) {
                     formData.append('file', fileInput.files[0]);
+                }
+
+                // Debug: Log FormData contents
+                console.log('FormData contents:');
+                for (let [key, value] of formData.entries()) {
+                    console.log(`${key}:`, value);
                 }
 
                 const token = localStorage.getItem('access_token') || document.getElementById('authToken').value;
@@ -886,15 +914,23 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
                     throw new Error('No authentication token found');
                 }
 
+                console.log('Sending request to:', `${API_BASE}/api/jobs/update`);
+                console.log('Authorization token:', token.substring(0, 20) + '...');
+
                 const response = await fetch(`${API_BASE}/api/jobs/update`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`
+                        // Note: Don't set Content-Type for FormData - browser will set it with boundary
                     },
                     body: formData
                 });
 
+                console.log('Response status:', response.status);
+                console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
                 const data = await response.json();
+                console.log('Response data:', data);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${data.detail || data.message || 'Unknown error'}`);
@@ -903,6 +939,7 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
                 showResult('updateJobResult', data);
                 
             } catch (error) {
+                console.error('Error in updateJob:', error);
                 showResult('updateJobResult', error.message, true);
             }
         }
@@ -930,13 +967,27 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
                     sweep_params: sweepParams
                 };
                 
-                const data = await makeRequest(`${API_BASE}/api/jobs/ready`, {
+                const formData = new FormData();
+                formData.append('data', JSON.stringify(requestData));
+                
+                const token = localStorage.getItem('access_token') || document.getElementById('authToken').value;
+                if (!token) {
+                    throw new Error('No authentication token found');
+                }
+
+                const response = await fetch(`${API_BASE}/api/jobs/update`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify(requestData)
+                    body: formData
                 });
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${data.detail || data.message || 'Unknown error'}`);
+                }
                 
                 showResult('markJobReadyResult', data);
                 
@@ -955,6 +1006,38 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
                 showResult('getJobFilesResult', data);
             } catch (error) {
                 showResult('getJobFilesResult', error.message, true);
+            }
+        }
+
+        async function checkJobStatusBeforeUpdate() {
+            try {
+                const jobId = document.getElementById('updateJobId').value;
+                if (!jobId) {
+                    throw new Error('Please enter a job ID');
+                }
+                
+                console.log('Checking job status for:', jobId);
+                
+                // Get full job details
+                const jobData = await makeRequest(`${API_BASE}/api/jobs/${jobId}`);
+                console.log('Full job data:', jobData);
+                
+                // Get job status
+                const statusData = await makeRequest(`${API_BASE}/api/jobs/${jobId}/status`);
+                console.log('Job status:', statusData);
+                
+                const result = {
+                    job_id: jobId,
+                    full_job: jobData,
+                    status: statusData,
+                    can_cancel: ['pending', 'ready', 'queued'].includes(statusData.status)
+                };
+                
+                showResult('updateJobResult', result);
+                
+            } catch (error) {
+                console.error('Error checking job status:', error);
+                showResult('updateJobResult', error.message, true);
             }
         }
     </script>
