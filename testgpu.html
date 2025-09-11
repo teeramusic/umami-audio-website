@@ -178,9 +178,9 @@
             <h3>🔄 New Job Lifecycle Workflow</h3>
             <p><strong>Step 1:</strong> Create a new job with <code>GET /api/jobs/create</code></p>
             <p><strong>Step 2:</strong> Upload files with <code>POST /api/jobs/update</code> (task: upload)</p>
-            <p><strong>Step 3:</strong> Mark job ready with <code>POST /api/jobs/ready</code> (includes metadata)</p>
+            <p><strong>Step 3:</strong> Mark job ready with <code>POST /api/jobs/update</code> (task: ready, includes metadata)</p>
             <p><strong>Step 4:</strong> Monitor progress with <code>GET /api/jobs/{job_id}/status</code></p>
-            <p><strong>Step 5:</strong> Download results when complete</p>
+            <p><strong>Step 5:</strong> Download calibration file with <code>GET /api/jobs/{job_id}/calibration</code> when complete</p>
         </div>
         
         <!-- Authentication Section -->
@@ -299,6 +299,39 @@ file: [audio file] (required for upload/replace)</div>
                 <button class="test-button" onclick="updateJob()">Update Job</button>
                 <button class="test-button" onclick="checkJobStatusBeforeUpdate()">Check Job Status First</button>
                 <div id="updateJobResult" class="result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Multiple File Upload Section -->
+        <div class="endpoint-section" style="background-color: #f0f8ff; border-color: #4a90e2;">
+            <div class="endpoint-title">
+                <span class="endpoint-method method-post">POST</span>
+                <span>/api/jobs/update (Multiple Files)</span>
+            </div>
+            <div class="endpoint-url">POST https://udev-backend.teeramusic.com:15351/api/jobs/update</div>
+            <div class="description">
+                <strong>Upload multiple files at once</strong><br>
+                Select multiple files and upload them sequentially with automatic sequential naming (1.wav, 2.wav, etc.).
+            </div>
+            
+            <div class="test-controls">
+                <div class="input-group">
+                    <label for="multiUploadJobId">Job ID:</label>
+                    <input type="text" id="multiUploadJobId" placeholder="Enter job ID..." />
+                </div>
+                <div class="input-group">
+                    <label for="multiUploadFiles">Select Multiple Files:</label>
+                    <input type="file" id="multiUploadFiles" class="file-input" accept=".wav,.wv,.flac" multiple />
+                </div>
+                <div class="input-group">
+                    <label>Upload Queue:</label>
+                    <div id="uploadQueue" style="background-color: white; padding: 10px; border: 1px solid #ddd; border-radius: 4px; max-height: 200px; overflow-y: auto;">
+                        <em>No files selected</em>
+                    </div>
+                </div>
+                <button class="test-button" onclick="startMultipleUpload()">Upload Files</button>
+                <button class="test-button" onclick="clearUploadQueue()">Clear Queue</button>
+                <div id="multiUploadResult" class="result" style="display: none;"></div>
             </div>
         </div>
 
@@ -428,6 +461,49 @@ file: [audio file] (required for upload/replace)</div>
                 </div>
                 <button class="test-button" onclick="getJobFiles()">Get Job Files</button>
                 <div id="getJobFilesResult" class="result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- GET /api/jobs/{job_id}/calibration - Download Calibration File -->
+        <div class="endpoint-section">
+            <div class="endpoint-title">
+                <span class="endpoint-method method-get">GET</span>
+                <span>/api/jobs/{job_id}/calibration</span>
+            </div>
+            <div class="endpoint-url">GET https://udev-backend.teeramusic.com:15351/api/jobs/{job_id}/calibration</div>
+            <div class="description">
+                <strong>Download calibration file or get job status</strong><br>
+                Downloads the calibration file (job_id.npz) when job is complete, or returns job status information if not ready.
+            </div>
+            
+            <div class="request-response">
+                <div class="request">
+                    <h4>Path Parameters</h4>
+                    <div class="json-block">job_id: string (required)</div>
+                </div>
+                <div class="response">
+                    <h4>Response (File Download or Status)</h4>
+                    <div class="json-block">If job is complete:
+- Downloads {job_id}.npz file
+
+If job is not complete:
+{
+  "job_id": "uuid-string",
+  "status": "processing",
+  "progress": 75.5,
+  "error_message": null,
+  "message": "Calibration is not ready. Job status: processing"
+}</div>
+                </div>
+            </div>
+            
+            <div class="test-controls">
+                <div class="input-group">
+                    <label for="calibrationJobId">Job ID:</label>
+                    <input type="text" id="calibrationJobId" placeholder="Enter job ID..." />
+                </div>
+                <button class="test-button" onclick="getCalibrationFile()">Get Calibration File</button>
+                <div id="getCalibrationFileResult" class="result" style="display: none;"></div>
             </div>
         </div>
 
@@ -649,6 +725,8 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
     <script>
         const API_BASE = 'https://udev-backend.teeramusic.com:15351';
         let pollingInterval = null;
+        let uploadQueue = [];
+        let isUploading = false;
 
         function getAuthHeaders() {
             // First try to get token from localStorage (from main app)
@@ -855,6 +933,8 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
                 document.getElementById('updateJobId').value = data.job_id;
                 document.getElementById('readyJobId').value = data.job_id;
                 document.getElementById('filesJobId').value = data.job_id;
+                document.getElementById('calibrationJobId').value = data.job_id;
+                document.getElementById('multiUploadJobId').value = data.job_id;
                 
             } catch (error) {
                 showResult('createNewJobResult', error.message, true);
@@ -1009,6 +1089,56 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
             }
         }
 
+        async function getCalibrationFile() {
+            try {
+                const jobId = document.getElementById('calibrationJobId').value;
+                if (!jobId) {
+                    throw new Error('Please enter a job ID');
+                }
+                
+                const token = localStorage.getItem('access_token') || document.getElementById('authToken').value;
+                if (!token) {
+                    throw new Error('No authentication token found');
+                }
+
+                const response = await fetch(`${API_BASE}/api/jobs/${jobId}/calibration`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`HTTP ${response.status}: ${errorData.detail || errorData.message || 'Unknown error'}`);
+                }
+
+                // Check if response is a file download (content-type indicates file)
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/octet-stream')) {
+                    // It's a file download
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${jobId}.npz`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    
+                    showResult('getCalibrationFileResult', `Calibration file ${jobId}.npz downloaded successfully!`);
+                } else {
+                    // It's a JSON response with job status
+                    const data = await response.json();
+                    showResult('getCalibrationFileResult', data);
+                }
+                
+            } catch (error) {
+                showResult('getCalibrationFileResult', error.message, true);
+            }
+        }
+
         async function checkJobStatusBeforeUpdate() {
             try {
                 const jobId = document.getElementById('updateJobId').value;
@@ -1040,6 +1170,187 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
                 showResult('updateJobResult', error.message, true);
             }
         }
+
+        // ============================================================================
+        // MULTIPLE FILE UPLOAD FUNCTIONS
+        // ============================================================================
+
+        function updateUploadQueue() {
+            const fileInput = document.getElementById('multiUploadFiles');
+            const queueDiv = document.getElementById('uploadQueue');
+            
+            if (fileInput.files.length === 0) {
+                queueDiv.innerHTML = '<em>No files selected</em>';
+                uploadQueue = [];
+                return;
+            }
+            
+            uploadQueue = Array.from(fileInput.files).map((file, index) => {
+                const extension = file.name.split('.').pop().toLowerCase();
+                const targetName = `${String(index + 1).padStart(4, '0')}.${extension}`;
+                return {
+                    file: file,
+                    targetName: targetName,
+                    status: 'pending',
+                    progress: 0
+                };
+            });
+            
+            displayUploadQueue();
+        }
+
+        function displayUploadQueue() {
+            const queueDiv = document.getElementById('uploadQueue');
+            
+            if (uploadQueue.length === 0) {
+                queueDiv.innerHTML = '<em>No files selected</em>';
+                return;
+            }
+            
+            let html = '<div style="font-size: 12px;">';
+            uploadQueue.forEach((item, index) => {
+                const statusIcon = item.status === 'pending' ? '⏳' : 
+                                 item.status === 'uploading' ? '⬆️' : 
+                                 item.status === 'success' ? '✅' : '❌';
+                const progressBar = item.status === 'uploading' ? 
+                    `<div style="background: #e0e0e0; height: 4px; border-radius: 2px; margin: 2px 0;">
+                        <div style="background: #4CAF50; height: 100%; width: ${item.progress}%; border-radius: 2px;"></div>
+                    </div>` : '';
+                
+                html += `<div style="margin: 2px 0; padding: 2px;">
+                    ${statusIcon} ${item.targetName} (${(item.file.size / 1024).toFixed(1)} KB)
+                    ${progressBar}
+                </div>`;
+            });
+            html += '</div>';
+            
+            queueDiv.innerHTML = html;
+        }
+
+        function clearUploadQueue() {
+            document.getElementById('multiUploadFiles').value = '';
+            uploadQueue = [];
+            updateUploadQueue();
+            showResult('multiUploadResult', 'Upload queue cleared', false);
+        }
+
+        async function startMultipleUpload() {
+            const jobId = document.getElementById('multiUploadJobId').value;
+            
+            if (!jobId) {
+                showResult('multiUploadResult', 'Please enter a job ID', true);
+                return;
+            }
+            
+            if (uploadQueue.length === 0) {
+                showResult('multiUploadResult', 'Please select files to upload', true);
+                return;
+            }
+            
+            if (isUploading) {
+                showResult('multiUploadResult', 'Upload already in progress', true);
+                return;
+            }
+            
+            isUploading = true;
+            const results = [];
+            
+            try {
+                showResult('multiUploadResult', 'Starting multiple file upload...', false);
+                
+                for (let i = 0; i < uploadQueue.length; i++) {
+                    const item = uploadQueue[i];
+                    item.status = 'uploading';
+                    item.progress = 0;
+                    displayUploadQueue();
+                    
+                    try {
+                        const result = await uploadSingleFile(jobId, item.file, item.targetName, (progress) => {
+                            item.progress = progress;
+                            displayUploadQueue();
+                        });
+                        
+                        item.status = 'success';
+                        item.progress = 100;
+                        results.push({ file: item.targetName, success: true, result: result });
+                        
+                    } catch (error) {
+                        item.status = 'error';
+                        results.push({ file: item.targetName, success: false, error: error.message });
+                    }
+                    
+                    displayUploadQueue();
+                }
+                
+                const successCount = results.filter(r => r.success).length;
+                const errorCount = results.filter(r => !r.success).length;
+                
+                showResult('multiUploadResult', {
+                    message: `Upload completed: ${successCount} successful, ${errorCount} failed`,
+                    results: results
+                });
+                
+            } catch (error) {
+                showResult('multiUploadResult', error.message, true);
+            } finally {
+                isUploading = false;
+            }
+        }
+
+        async function uploadSingleFile(jobId, file, targetName, progressCallback) {
+            const token = localStorage.getItem('access_token') || document.getElementById('authToken').value;
+            if (!token) {
+                throw new Error('No authentication token found');
+            }
+
+            const formData = new FormData();
+            formData.append('data', JSON.stringify({
+                job_id: jobId,
+                task: 'upload',
+                target: targetName
+            }));
+            formData.append('file', file);
+
+            // Simulate progress for better UX
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 20;
+                if (progress > 90) progress = 90;
+                progressCallback(progress);
+            }, 200);
+
+            try {
+                const response = await fetch(`${API_BASE}/api/jobs/update`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                clearInterval(progressInterval);
+                progressCallback(100);
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${data.detail || data.message || 'Unknown error'}`);
+                }
+
+                return data;
+            } catch (error) {
+                clearInterval(progressInterval);
+                throw error;
+            }
+        }
+
+        // Add event listener for file input change
+        document.addEventListener('DOMContentLoaded', function() {
+            const multiUploadFiles = document.getElementById('multiUploadFiles');
+            if (multiUploadFiles) {
+                multiUploadFiles.addEventListener('change', updateUploadQueue);
+            }
+        });
     </script>
 </body>
 </html>
