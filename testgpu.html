@@ -470,6 +470,233 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
                 <div id="cancelJobResult" class="result" style="display: none;"></div>
             </div>
         </div>
+
+        <!-- ============================================================================ -->
+        <!-- NEW JOB LIFECYCLE ENDPOINTS -->
+        <!-- ============================================================================ -->
+        
+        <h1 style="margin-top: 60px; color: #e74c3c; border-top: 3px solid #e74c3c; padding-top: 20px;">🔄 New Job Lifecycle Endpoints</h1>
+
+        <!-- GET /api/jobs/create - Create New Job -->
+        <div class="endpoint-section">
+            <div class="endpoint-title">
+                <span class="endpoint-method method-get">GET</span>
+                <span>/api/jobs/create</span>
+            </div>
+            <div class="endpoint-url">GET https://udev-backend.teeramusic.com:15351/api/jobs/create</div>
+            <div class="description">
+                <strong>Create a new job</strong><br>
+                Creates a new job with pending status and returns a job UUID. Job expires in 3 days if not completed.
+            </div>
+            
+            <div class="request-response">
+                <div class="request">
+                    <h4>No Parameters</h4>
+                    <div class="json-block">No request body or query parameters</div>
+                </div>
+                <div class="response">
+                    <h4>Response</h4>
+                    <div class="json-block">{
+  "job_id": "uuid-string"
+}</div>
+                </div>
+            </div>
+            
+            <div class="test-controls">
+                <button class="test-button" onclick="createNewJob()">Create New Job</button>
+                <div id="createNewJobResult" class="result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- POST /api/jobs/update - Update Job -->
+        <div class="endpoint-section">
+            <div class="endpoint-title">
+                <span class="endpoint-method method-post">POST</span>
+                <span>/api/jobs/update</span>
+            </div>
+            <div class="endpoint-url">POST https://udev-backend.teeramusic.com:15351/api/jobs/update</div>
+            <div class="description">
+                <strong>Update a job</strong><br>
+                Upload, replace, delete files or cancel a job. Supports multiple file operations.
+            </div>
+            
+            <div class="request-response">
+                <div class="request">
+                    <h4>Request Body (JSON)</h4>
+                    <div class="json-block">{
+  "job_id": "uuid-string",
+  "task": "upload|replace|delete|cancel",
+  "target": "filename.wav"  // required for upload/replace/delete
+}</div>
+                    <h4>Form Data (File Upload)</h4>
+                    <div class="json-block">file: [audio file] (required for upload/replace)</div>
+                </div>
+                <div class="response">
+                    <h4>Response</h4>
+                    <div class="json-block">{
+  "message": "File uploaded successfully",
+  "file": {
+    "name": "filename.wav",
+    "size": 1024,
+    "uploaded_at": "2024-01-01T12:00:00Z"
+  }
+}</div>
+                </div>
+            </div>
+            
+            <div class="test-controls">
+                <div class="input-group">
+                    <label for="updateJobId">Job ID:</label>
+                    <input type="text" id="updateJobId" placeholder="Enter job ID..." />
+                </div>
+                <div class="input-group">
+                    <label for="updateTask">Task:</label>
+                    <select id="updateTask">
+                        <option value="upload">Upload File</option>
+                        <option value="replace">Replace File</option>
+                        <option value="delete">Delete File</option>
+                        <option value="cancel">Cancel Job</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="updateTarget">Target Filename:</label>
+                    <input type="text" id="updateTarget" placeholder="filename.wav" />
+                </div>
+                <div class="input-group">
+                    <label for="updateFile">File Upload:</label>
+                    <input type="file" id="updateFile" class="file-input" accept=".wav,.wv,.flac" />
+                </div>
+                <button class="test-button" onclick="updateJob()">Update Job</button>
+                <div id="updateJobResult" class="result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- POST /api/jobs/ready - Mark Job Ready -->
+        <div class="endpoint-section">
+            <div class="endpoint-title">
+                <span class="endpoint-method method-post">POST</span>
+                <span>/api/jobs/ready</span>
+            </div>
+            <div class="endpoint-url">POST https://udev-backend.teeramusic.com:15351/api/jobs/ready</div>
+            <div class="description">
+                <strong>Mark job as ready for processing</strong><br>
+                Submit job with metadata for GPU processing. Job must have files and valid metadata.
+            </div>
+            
+            <div class="request-response">
+                <div class="request">
+                    <h4>Request Body (JSON)</h4>
+                    <div class="json-block">{
+  "job_id": "uuid-string",
+  "task": "ready",
+  "speaker_names": ["kii L", "Kii R", "Adam L", "Adam R", "Sub L", "Sub R"],
+  "is_subwoofer": [false, false, false, false, true, true],
+  "bitdepth": "int24",
+  "sampling_rate": 96000,
+  "sweep_params": {
+    "type": "type_1",
+    "version": "1.0.0",
+    "start_frequency": 20,
+    "end_frequency": 20000,
+    "start_silence": 100,
+    "stop_silence": 100,
+    "sweep_length": 1000
+  }
+}</div>
+                </div>
+                <div class="response">
+                    <h4>Response</h4>
+                    <div class="json-block">{
+  "message": "Job marked as ready for processing",
+  "job_id": "uuid-string",
+  "status": "queued",
+  "estimated_eta": "Processing will begin shortly"
+}</div>
+                </div>
+            </div>
+            
+            <div class="test-controls">
+                <div class="input-group">
+                    <label for="readyJobId">Job ID:</label>
+                    <input type="text" id="readyJobId" placeholder="Enter job ID..." />
+                </div>
+                <div class="input-group">
+                    <label for="speakerNames">Speaker Names (JSON):</label>
+                    <textarea id="speakerNames">["kii L", "Kii R", "Adam L", "Adam R", "Sub L", "Sub R"]</textarea>
+                </div>
+                <div class="input-group">
+                    <label for="isSubwoofer">Is Subwoofer (JSON):</label>
+                    <textarea id="isSubwoofer">[false, false, false, false, true, true]</textarea>
+                </div>
+                <div class="input-group">
+                    <label for="bitdepth">Bit Depth:</label>
+                    <select id="bitdepth">
+                        <option value="int24">int24</option>
+                        <option value="float32">float32</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="samplingRate">Sampling Rate:</label>
+                    <input type="number" id="samplingRate" value="96000" />
+                </div>
+                <div class="input-group">
+                    <label for="sweepParams">Sweep Parameters (JSON):</label>
+                    <textarea id="sweepParams">{
+  "type": "type_1",
+  "version": "1.0.0",
+  "start_frequency": 20,
+  "end_frequency": 20000,
+  "start_silence": 100,
+  "stop_silence": 100,
+  "sweep_length": 1000
+}</textarea>
+                </div>
+                <button class="test-button" onclick="markJobReady()">Mark Job Ready</button>
+                <div id="markJobReadyResult" class="result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- GET /api/jobs/{job_id}/files - List Job Files -->
+        <div class="endpoint-section">
+            <div class="endpoint-title">
+                <span class="endpoint-method method-get">GET</span>
+                <span>/api/jobs/{job_id}/files</span>
+            </div>
+            <div class="endpoint-url">GET https://udev-backend.teeramusic.com:15351/api/jobs/{job_id}/files</div>
+            <div class="description">
+                <strong>List job files</strong><br>
+                Get list of all files associated with a job.
+            </div>
+            
+            <div class="request-response">
+                <div class="request">
+                    <h4>Path Parameters</h4>
+                    <div class="json-block">job_id: string (required)</div>
+                </div>
+                <div class="response">
+                    <h4>Response</h4>
+                    <div class="json-block">{
+  "job_id": "uuid-string",
+  "files": [
+    {
+      "name": "1.wav",
+      "size": 1024,
+      "uploaded_at": "2024-01-01T12:00:00Z"
+    }
+  ]
+}</div>
+                </div>
+            </div>
+            
+            <div class="test-controls">
+                <div class="input-group">
+                    <label for="filesJobId">Job ID:</label>
+                    <input type="text" id="filesJobId" placeholder="Enter job ID..." />
+                </div>
+                <button class="test-button" onclick="getJobFiles()">Get Job Files</button>
+                <div id="getJobFilesResult" class="result" style="display: none;"></div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -710,6 +937,131 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
         document.getElementById('authToken').addEventListener('input', (e) => {
             localStorage.setItem('authToken', e.target.value);
         });
+
+        // ============================================================================
+        // NEW JOB LIFECYCLE FUNCTIONS
+        // ============================================================================
+
+        async function createNewJob() {
+            try {
+                const data = await makeRequest(`${API_BASE}/api/jobs/create`);
+                showResult('createNewJobResult', data);
+                
+                // Auto-fill job ID fields with the created job ID
+                document.getElementById('updateJobId').value = data.job_id;
+                document.getElementById('readyJobId').value = data.job_id;
+                document.getElementById('filesJobId').value = data.job_id;
+                
+            } catch (error) {
+                showResult('createNewJobResult', error.message, true);
+            }
+        }
+
+        async function updateJob() {
+            try {
+                const jobId = document.getElementById('updateJobId').value;
+                const task = document.getElementById('updateTask').value;
+                const target = document.getElementById('updateTarget').value;
+                const fileInput = document.getElementById('updateFile');
+                
+                if (!jobId) {
+                    throw new Error('Please enter a job ID');
+                }
+                
+                if (task !== 'cancel' && !target) {
+                    throw new Error('Please enter a target filename');
+                }
+                
+                if ((task === 'upload' || task === 'replace') && !fileInput.files[0]) {
+                    throw new Error('Please select a file to upload');
+                }
+                
+                const formData = new FormData();
+                formData.append('job_id', jobId);
+                formData.append('task', task);
+                if (target) {
+                    formData.append('target', target);
+                }
+                if (fileInput.files[0]) {
+                    formData.append('file', fileInput.files[0]);
+                }
+
+                const token = localStorage.getItem('access_token') || document.getElementById('authToken').value;
+                if (!token) {
+                    throw new Error('No authentication token found');
+                }
+
+                const response = await fetch(`${API_BASE}/api/jobs/update`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${data.detail || data.message || 'Unknown error'}`);
+                }
+
+                showResult('updateJobResult', data);
+                
+            } catch (error) {
+                showResult('updateJobResult', error.message, true);
+            }
+        }
+
+        async function markJobReady() {
+            try {
+                const jobId = document.getElementById('readyJobId').value;
+                const speakerNames = JSON.parse(document.getElementById('speakerNames').value);
+                const isSubwoofer = JSON.parse(document.getElementById('isSubwoofer').value);
+                const bitdepth = document.getElementById('bitdepth').value;
+                const samplingRate = parseInt(document.getElementById('samplingRate').value);
+                const sweepParams = JSON.parse(document.getElementById('sweepParams').value);
+                
+                if (!jobId) {
+                    throw new Error('Please enter a job ID');
+                }
+                
+                const requestData = {
+                    job_id: jobId,
+                    task: "ready",
+                    speaker_names: speakerNames,
+                    is_subwoofer: isSubwoofer,
+                    bitdepth: bitdepth,
+                    sampling_rate: samplingRate,
+                    sweep_params: sweepParams
+                };
+                
+                const data = await makeRequest(`${API_BASE}/api/jobs/ready`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                showResult('markJobReadyResult', data);
+                
+            } catch (error) {
+                showResult('markJobReadyResult', error.message, true);
+            }
+        }
+
+        async function getJobFiles() {
+            try {
+                const jobId = document.getElementById('filesJobId').value;
+                if (!jobId) {
+                    throw new Error('Please enter a job ID');
+                }
+                const data = await makeRequest(`${API_BASE}/api/jobs/${jobId}/files`);
+                showResult('getJobFilesResult', data);
+            } catch (error) {
+                showResult('getJobFilesResult', error.message, true);
+            }
+        }
     </script>
 </body>
 </html>
