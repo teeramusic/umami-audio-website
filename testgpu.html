@@ -171,7 +171,17 @@
 </head>
 <body>
     <div class="container">
-        <h1>🔧 GPU Job Endpoints Test Interface</h1>
+        <h1>🔧 New Job Lifecycle API Test Interface</h1>
+        
+        <!-- Workflow Information -->
+        <div class="auth-section" style="background-color: #e8f5e8; border-color: #4caf50;">
+            <h3>🔄 New Job Lifecycle Workflow</h3>
+            <p><strong>Step 1:</strong> Create a new job with <code>GET /api/jobs/create</code></p>
+            <p><strong>Step 2:</strong> Upload files with <code>POST /api/jobs/update</code> (task: upload)</p>
+            <p><strong>Step 3:</strong> Mark job ready with <code>POST /api/jobs/ready</code> (includes metadata)</p>
+            <p><strong>Step 4:</strong> Monitor progress with <code>GET /api/jobs/{job_id}/status</code></p>
+            <p><strong>Step 5:</strong> Download results when complete</p>
+        </div>
         
         <!-- Authentication Section -->
         <div class="auth-section">
@@ -185,297 +195,11 @@
             <span id="authStatus"></span>
         </div>
 
-        <!-- POST /api/jobs/ - Create Job -->
-        <div class="endpoint-section">
-            <div class="endpoint-title">
-                <span class="endpoint-method method-post">POST</span>
-                <span>/api/jobs/</span>
-            </div>
-            <div class="endpoint-url">POST https://udev-backend.teeramusic.com:15351/api/jobs/</div>
-            <div class="description">
-                <strong>Create a new GPU processing job</strong><br>
-                Creates a job record in the database, handles file uploads, and queues the job for GPU processing.
-            </div>
-            
-            <div class="request-response">
-                <div class="request">
-                    <h4>Request Body (JSON)</h4>
-                    <div class="json-block">{
-  "title": "My GPU Processing Job",
-  "description": "Process audio file for calibration",
-  "parameters": {
-    <!-- input_format is either pete or teera -->
-    "input_format": "teera"
-  },
-  "priority": 0
-}</div>
-                    <h4>Form Data (File Upload)</h4>
-                    <div class="json-block">file: [audio file] (optional)</div>
-                </div>
-                <div class="response">
-                    <h4>Response (JobResponse)</h4>
-                    <div class="json-block">{
-  "id": 123,
-  "job_id": "uuid-string",
-  "title": "My GPU Processing Job",
-  "description": "Process audio file for calibration",
-  "status": "pending",
-  "progress": 0.0,
-  "priority": 0,
-  "parameters": {...},
-  "result": null,
-  "error_message": null,
-  "created_at": "2024-01-01T12:00:00Z",
-  "updated_at": "2024-01-01T12:00:00Z",
-  "started_at": null,
-  "completed_at": null,
-  "estimated_duration": null,
-  "actual_duration": null
-}</div>
-                </div>
-            </div>
-            
-            <div class="test-controls">
-                <div class="input-group">
-                    <label for="jobTitle">Job Title:</label>
-                    <input type="text" id="jobTitle" value="Test GPU Job" />
-                </div>
-                <div class="input-group">
-                    <label for="jobDescription">Description:</label>
-                    <input type="text" id="jobDescription" value="Test job for GPU processing" />
-                </div>
-                <div class="input-group">
-                    <label for="jobParameters">Parameters (JSON):</label>
-                    <textarea id="jobParameters">{"quality": "high", "format": "wav"}</textarea>
-                </div>
-                <div class="input-group">
-                    <label for="jobPriority">Priority:</label>
-                    <select id="jobPriority">
-                        <option value="0">Normal (0)</option>
-                        <option value="1">High (1)</option>
-                        <option value="-1">Low (-1)</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="jobFile">File Upload (optional):</label>
-                    <input type="file" id="jobFile" class="file-input" accept=".wav,.mp3,.txt,.zip" />
-                </div>
-                <button class="test-button" onclick="createJob()">Create Job</button>
-                <div id="createJobResult" class="result" style="display: none;"></div>
-            </div>
-        </div>
-
-        <!-- GET /api/jobs/ - Get All Jobs -->
-        <div class="endpoint-section">
-            <div class="endpoint-title">
-                <span class="endpoint-method method-get">GET</span>
-                <span>/api/jobs/</span>
-            </div>
-            <div class="endpoint-url">GET https://udev-backend.teeramusic.com:15351/api/jobs/?skip=0&limit=100</div>
-            <div class="description">
-                <strong>Get all jobs for current user</strong><br>
-                Returns a paginated list of jobs belonging to the authenticated user, ordered by creation date.
-            </div>
-            
-            <div class="request-response">
-                <div class="request">
-                    <h4>Query Parameters</h4>
-                    <div class="json-block">skip: 0 (optional, default: 0)
-limit: 100 (optional, default: 100)</div>
-                </div>
-                <div class="response">
-                    <h4>Response (JobResponse[])</h4>
-                    <div class="json-block">[
-  {
-    "id": 123,
-    "job_id": "uuid-string",
-    "title": "My GPU Processing Job",
-    "status": "pending",
-    "progress": 0.0,
-    "created_at": "2024-01-01T12:00:00Z",
-    ...
-  }
-]</div>
-                </div>
-            </div>
-            
-            <div class="test-controls">
-                <div class="input-group">
-                    <label for="jobsSkip">Skip:</label>
-                    <input type="number" id="jobsSkip" value="0" min="0" />
-                </div>
-                <div class="input-group">
-                    <label for="jobsLimit">Limit:</label>
-                    <input type="number" id="jobsLimit" value="100" min="1" max="1000" />
-                </div>
-                <button class="test-button" onclick="getAllJobs()">Get All Jobs</button>
-                <div id="getAllJobsResult" class="result" style="display: none;"></div>
-            </div>
-        </div>
-
-        <!-- GET /api/jobs/{job_id} - Get Specific Job -->
-        <div class="endpoint-section">
-            <div class="endpoint-title">
-                <span class="endpoint-method method-get">GET</span>
-                <span>/api/jobs/{job_id}</span>
-            </div>
-            <div class="endpoint-url">GET https://udev-backend.teeramusic.com:15351/api/jobs/{job_id}</div>
-            <div class="description">
-                <strong>Get specific job details</strong><br>
-                Returns detailed information about a specific job by its job_id. Only returns jobs belonging to the authenticated user.
-            </div>
-            
-            <div class="request-response">
-                <div class="request">
-                    <h4>Path Parameters</h4>
-                    <div class="json-block">job_id: string (required)
-Example: "550e8400-e29b-41d4-a716-446655440000"</div>
-                </div>
-                <div class="response">
-                    <h4>Response (JobResponse)</h4>
-                    <div class="json-block">{
-  "id": 123,
-  "job_id": "550e8400-e29b-41d4-a716-446655440000",
-  "title": "My GPU Processing Job",
-  "description": "Process audio file for calibration",
-  "status": "completed",
-  "progress": 100.0,
-  "result": {
-    "output_file": "processed_audio.wav",
-    "processing_time": 45.2
-  },
-  "created_at": "2024-01-01T12:00:00Z",
-  "completed_at": "2024-01-01T12:01:00Z"
-}</div>
-                </div>
-            </div>
-            
-            <div class="test-controls">
-                <div class="input-group">
-                    <label for="specificJobId">Job ID:</label>
-                    <input type="text" id="specificJobId" placeholder="Enter job ID..." />
-                </div>
-                <button class="test-button" onclick="getSpecificJob()">Get Job Details</button>
-                <div id="getSpecificJobResult" class="result" style="display: none;"></div>
-            </div>
-        </div>
-
-        <!-- GET /api/jobs/{job_id}/status - Get Job Status -->
-        <div class="endpoint-section">
-            <div class="endpoint-title">
-                <span class="endpoint-method method-get">GET</span>
-                <span>/api/jobs/{job_id}/status</span>
-            </div>
-            <div class="endpoint-url">GET https://udev-backend.teeramusic.com:15351/api/jobs/{job_id}/status</div>
-            <div class="description">
-                <strong>Get job status for polling</strong><br>
-                Returns lightweight job status information, perfect for polling to check job progress without fetching full job details.
-            </div>
-            
-            <div class="request-response">
-                <div class="request">
-                    <h4>Path Parameters</h4>
-                    <div class="json-block">job_id: string (required)</div>
-                </div>
-                <div class="response">
-                    <h4>Response (JobStatus)</h4>
-                    <div class="json-block">{
-  "job_id": "550e8400-e29b-41d4-a716-446655440000",
-  "status": "processing",
-  "progress": 75.5,
-  "error_message": null
-}</div>
-                </div>
-            </div>
-            
-            <div class="test-controls">
-                <div class="input-group">
-                    <label for="statusJobId">Job ID:</label>
-                    <input type="text" id="statusJobId" placeholder="Enter job ID..." />
-                </div>
-                <button class="test-button" onclick="getJobStatus()">Get Job Status</button>
-                <button class="test-button" onclick="startPolling()">Start Polling (5s)</button>
-                <button class="test-button" onclick="stopPolling()">Stop Polling</button>
-                <div id="getJobStatusResult" class="result" style="display: none;"></div>
-            </div>
-        </div>
-
-        <!-- GET /api/jobs/queue/status - Get Queue Status -->
-        <div class="endpoint-section">
-            <div class="endpoint-title">
-                <span class="endpoint-method method-get">GET</span>
-                <span>/api/jobs/queue/status</span>
-            </div>
-            <div class="endpoint-url">GET https://udev-backend.teeramusic.com:15351/api/jobs/queue/status</div>
-            <div class="description">
-                <strong>Get current queue status</strong><br>
-                Returns information about the current job queue, including queue length, processing jobs, and estimated wait times.
-            </div>
-            
-            <div class="request-response">
-                <div class="request">
-                    <h4>No Parameters</h4>
-                    <div class="json-block">No request body or query parameters</div>
-                </div>
-                <div class="response">
-                    <h4>Response (QueueInfo)</h4>
-                    <div class="json-block">{
-  "queue_length": 5,
-  "processing_jobs": 2,
-  "total_jobs": 7,
-  "estimated_wait_time": "3-5 minutes",
-  "gpu_available": true,
-  "last_updated": "2024-01-01T12:00:00Z"
-}</div>
-                </div>
-            </div>
-            
-            <div class="test-controls">
-                <button class="test-button" onclick="getQueueStatus()">Get Queue Status</button>
-                <div id="getQueueStatusResult" class="result" style="display: none;"></div>
-            </div>
-        </div>
-
-        <!-- DELETE /api/jobs/{job_id} - Cancel Job -->
-        <div class="endpoint-section">
-            <div class="endpoint-title">
-                <span class="endpoint-method method-delete">DELETE</span>
-                <span>/api/jobs/{job_id}</span>
-            </div>
-            <div class="endpoint-url">DELETE https://udev-backend.teeramusic.com:15351/api/jobs/{job_id}</div>
-            <div class="description">
-                <strong>Cancel a job</strong><br>
-                Cancels a job if it's in pending or processing status. Cannot cancel completed, failed, or already cancelled jobs.
-            </div>
-            
-            <div class="request-response">
-                <div class="request">
-                    <h4>Path Parameters</h4>
-                    <div class="json-block">job_id: string (required)</div>
-                </div>
-                <div class="response">
-                    <h4>Response</h4>
-                    <div class="json-block">{
-  "message": "Job cancelled successfully"
-}</div>
-                </div>
-            </div>
-            
-            <div class="test-controls">
-                <div class="input-group">
-                    <label for="cancelJobId">Job ID:</label>
-                    <input type="text" id="cancelJobId" placeholder="Enter job ID to cancel..." />
-                </div>
-                <button class="test-button" onclick="cancelJob()">Cancel Job</button>
-                <div id="cancelJobResult" class="result" style="display: none;"></div>
-            </div>
-        </div>
-
         <!-- ============================================================================ -->
         <!-- NEW JOB LIFECYCLE ENDPOINTS -->
         <!-- ============================================================================ -->
         
-        <h1 style="margin-top: 60px; color: #e74c3c; border-top: 3px solid #e74c3c; padding-top: 20px;">🔄 New Job Lifecycle Endpoints</h1>
+        <h1 style="margin-top: 40px; color: #2c3e50; border-top: 3px solid #2c3e50; padding-top: 20px;">🔄 New Job Lifecycle Endpoints</h1>
 
         <!-- GET /api/jobs/create - Create New Job -->
         <div class="endpoint-section">
@@ -697,6 +421,220 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
                 <div id="getJobFilesResult" class="result" style="display: none;"></div>
             </div>
         </div>
+
+        <!-- ============================================================================ -->
+        <!-- EXISTING JOB MANAGEMENT ENDPOINTS -->
+        <!-- ============================================================================ -->
+        
+        <h1 style="margin-top: 40px; color: #2c3e50; border-top: 3px solid #2c3e50; padding-top: 20px;">📋 Job Management Endpoints</h1>
+
+        <!-- GET /api/jobs/ - Get All Jobs -->
+        <div class="endpoint-section">
+            <div class="endpoint-title">
+                <span class="endpoint-method method-get">GET</span>
+                <span>/api/jobs/</span>
+            </div>
+            <div class="endpoint-url">GET https://udev-backend.teeramusic.com:15351/api/jobs/?skip=0&limit=100</div>
+            <div class="description">
+                <strong>Get all jobs for current user</strong><br>
+                Returns a paginated list of jobs belonging to the authenticated user, ordered by creation date.
+            </div>
+            
+            <div class="request-response">
+                <div class="request">
+                    <h4>Query Parameters</h4>
+                    <div class="json-block">skip: 0 (optional, default: 0)
+limit: 100 (optional, default: 100)</div>
+                </div>
+                <div class="response">
+                    <h4>Response (JobResponse[])</h4>
+                    <div class="json-block">[
+  {
+    "id": 123,
+    "job_id": "uuid-string",
+    "title": "My GPU Processing Job",
+    "status": "pending",
+    "progress": 0.0,
+    "created_at": "2024-01-01T12:00:00Z",
+    ...
+  }
+]</div>
+                </div>
+            </div>
+            
+            <div class="test-controls">
+                <div class="input-group">
+                    <label for="jobsSkip">Skip:</label>
+                    <input type="number" id="jobsSkip" value="0" min="0" />
+                </div>
+                <div class="input-group">
+                    <label for="jobsLimit">Limit:</label>
+                    <input type="number" id="jobsLimit" value="100" min="1" max="1000" />
+                </div>
+                <button class="test-button" onclick="getAllJobs()">Get All Jobs</button>
+                <div id="getAllJobsResult" class="result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- GET /api/jobs/{job_id} - Get Specific Job -->
+        <div class="endpoint-section">
+            <div class="endpoint-title">
+                <span class="endpoint-method method-get">GET</span>
+                <span>/api/jobs/{job_id}</span>
+            </div>
+            <div class="endpoint-url">GET https://udev-backend.teeramusic.com:15351/api/jobs/{job_id}</div>
+            <div class="description">
+                <strong>Get specific job details</strong><br>
+                Returns detailed information about a specific job by its job_id. Only returns jobs belonging to the authenticated user.
+            </div>
+            
+            <div class="request-response">
+                <div class="request">
+                    <h4>Path Parameters</h4>
+                    <div class="json-block">job_id: string (required)
+Example: "550e8400-e29b-41d4-a716-446655440000"</div>
+                </div>
+                <div class="response">
+                    <h4>Response (JobResponse)</h4>
+                    <div class="json-block">{
+  "id": 123,
+  "job_id": "550e8400-e29b-41d4-a716-446655440000",
+  "title": "My GPU Processing Job",
+  "description": "Process audio file for calibration",
+  "status": "completed",
+  "progress": 100.0,
+  "result": {
+    "output_file": "processed_audio.wav",
+    "processing_time": 45.2
+  },
+  "created_at": "2024-01-01T12:00:00Z",
+  "completed_at": "2024-01-01T12:01:00Z"
+}</div>
+                </div>
+            </div>
+            
+            <div class="test-controls">
+                <div class="input-group">
+                    <label for="specificJobId">Job ID:</label>
+                    <input type="text" id="specificJobId" placeholder="Enter job ID..." />
+                </div>
+                <button class="test-button" onclick="getSpecificJob()">Get Job Details</button>
+                <div id="getSpecificJobResult" class="result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- GET /api/jobs/{job_id}/status - Get Job Status -->
+        <div class="endpoint-section">
+            <div class="endpoint-title">
+                <span class="endpoint-method method-get">GET</span>
+                <span>/api/jobs/{job_id}/status</span>
+            </div>
+            <div class="endpoint-url">GET https://udev-backend.teeramusic.com:15351/api/jobs/{job_id}/status</div>
+            <div class="description">
+                <strong>Get job status for polling</strong><br>
+                Returns lightweight job status information, perfect for polling to check job progress without fetching full job details.
+            </div>
+            
+            <div class="request-response">
+                <div class="request">
+                    <h4>Path Parameters</h4>
+                    <div class="json-block">job_id: string (required)</div>
+                </div>
+                <div class="response">
+                    <h4>Response (JobStatus)</h4>
+                    <div class="json-block">{
+  "job_id": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "processing",
+  "progress": 75.5,
+  "error_message": null
+}</div>
+                </div>
+            </div>
+            
+            <div class="test-controls">
+                <div class="input-group">
+                    <label for="statusJobId">Job ID:</label>
+                    <input type="text" id="statusJobId" placeholder="Enter job ID..." />
+                </div>
+                <button class="test-button" onclick="getJobStatus()">Get Job Status</button>
+                <button class="test-button" onclick="startPolling()">Start Polling (5s)</button>
+                <button class="test-button" onclick="stopPolling()">Stop Polling</button>
+                <div id="getJobStatusResult" class="result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- GET /api/jobs/queue/status - Get Queue Status -->
+        <div class="endpoint-section">
+            <div class="endpoint-title">
+                <span class="endpoint-method method-get">GET</span>
+                <span>/api/jobs/queue/status</span>
+            </div>
+            <div class="endpoint-url">GET https://udev-backend.teeramusic.com:15351/api/jobs/queue/status</div>
+            <div class="description">
+                <strong>Get current queue status</strong><br>
+                Returns information about the current job queue, including queue length, processing jobs, and estimated wait times.
+            </div>
+            
+            <div class="request-response">
+                <div class="request">
+                    <h4>No Parameters</h4>
+                    <div class="json-block">No request body or query parameters</div>
+                </div>
+                <div class="response">
+                    <h4>Response (QueueInfo)</h4>
+                    <div class="json-block">{
+  "queue_length": 5,
+  "processing_jobs": 2,
+  "total_jobs": 7,
+  "estimated_wait_time": "3-5 minutes",
+  "gpu_available": true,
+  "last_updated": "2024-01-01T12:00:00Z"
+}</div>
+                </div>
+            </div>
+            
+            <div class="test-controls">
+                <button class="test-button" onclick="getQueueStatus()">Get Queue Status</button>
+                <div id="getQueueStatusResult" class="result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- DELETE /api/jobs/{job_id} - Cancel Job -->
+        <div class="endpoint-section">
+            <div class="endpoint-title">
+                <span class="endpoint-method method-delete">DELETE</span>
+                <span>/api/jobs/{job_id}</span>
+            </div>
+            <div class="endpoint-url">DELETE https://udev-backend.teeramusic.com:15351/api/jobs/{job_id}</div>
+            <div class="description">
+                <strong>Cancel a job</strong><br>
+                Cancels a job if it's in pending or processing status. Cannot cancel completed, failed, or already cancelled jobs.
+            </div>
+            
+            <div class="request-response">
+                <div class="request">
+                    <h4>Path Parameters</h4>
+                    <div class="json-block">job_id: string (required)</div>
+                </div>
+                <div class="response">
+                    <h4>Response</h4>
+                    <div class="json-block">{
+  "message": "Job cancelled successfully"
+}</div>
+                </div>
+            </div>
+            
+            <div class="test-controls">
+                <div class="input-group">
+                    <label for="cancelJobId">Job ID:</label>
+                    <input type="text" id="cancelJobId" placeholder="Enter job ID to cancel..." />
+                </div>
+                <button class="test-button" onclick="cancelJob()">Cancel Job</button>
+                <div id="cancelJobResult" class="result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- DUPLICATE ENDPOINTS REMOVED - See above for new job lifecycle endpoints -->
     </div>
 
     <script>
@@ -764,50 +702,7 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
             }
         }
 
-        async function createJob() {
-            try {
-                const formData = new FormData();
-                formData.append('title', document.getElementById('jobTitle').value);
-                formData.append('description', document.getElementById('jobDescription').value);
-                formData.append('parameters', document.getElementById('jobParameters').value);
-                formData.append('priority', document.getElementById('jobPriority').value);
-                
-                const fileInput = document.getElementById('jobFile');
-                if (fileInput.files[0]) {
-                    formData.append('file', fileInput.files[0]);
-                }
-
-                // Get token using the same logic as other functions
-                const token = localStorage.getItem('access_token') || document.getElementById('authToken').value;
-                if (!token) {
-                    throw new Error('No authentication token found. Please log in to the main application first or provide a Bearer token manually.');
-                }
-
-                const response = await fetch(`${API_BASE}/api/jobs/`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: formData
-                });
-
-                const data = await response.json();
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${data.detail || data.message || 'Unknown error'}`);
-                }
-
-                showResult('createJobResult', data);
-                
-                // Auto-fill job ID fields with the created job ID
-                document.getElementById('specificJobId').value = data.job_id;
-                document.getElementById('statusJobId').value = data.job_id;
-                document.getElementById('cancelJobId').value = data.job_id;
-                
-            } catch (error) {
-                showResult('createJobResult', error.message, true);
-            }
-        }
+        // OLD FUNCTION REMOVED - Use new job lifecycle functions below
 
         async function getAllJobs() {
             try {
