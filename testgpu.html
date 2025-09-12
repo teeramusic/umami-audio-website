@@ -167,6 +167,15 @@
         }
         .status-connected { background-color: #27ae60; }
         .status-disconnected { background-color: #e74c3c; }
+        .status-refreshing { 
+            background-color: #f39c12; 
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -187,11 +196,13 @@
         <div class="auth-section">
             <h3>🔐 Authentication Required</h3>
             <p>All job endpoints require authentication. The page will automatically use your token from the main application if you're logged in, or you can provide a Bearer token manually.</p>
+            <p><strong>🔄 Automatic Token Refresh:</strong> This page now automatically handles token refresh when your access token expires. If a request fails with a 401 error, the page will automatically attempt to refresh your token using the refresh token and retry the request seamlessly.</p>
             <div class="input-group">
                 <label for="authToken">Bearer Token (if not logged in to main app):</label>
                 <input type="text" id="authToken" placeholder="Enter your Bearer token here..." />
             </div>
             <button class="test-button" onclick="testAuth()">Test Authentication</button>
+            <button class="test-button" onclick="testTokenRefresh()">Test Token Refresh</button>
             <span id="authStatus"></span>
         </div>
 
@@ -727,6 +738,7 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
         let pollingInterval = null;
         let uploadQueue = [];
         let isUploading = false;
+        let isRefreshingToken = false;
 
         function getAuthHeaders() {
             // First try to get token from localStorage (from main app)
@@ -746,6 +758,95 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
             };
         }
 
+        async function refreshAccessToken() {
+            if (isRefreshingToken) {
+                // If already refreshing, wait for it to complete
+                return new Promise((resolve, reject) => {
+                    const checkRefresh = setInterval(() => {
+                        if (!isRefreshingToken) {
+                            clearInterval(checkRefresh);
+                            const newToken = localStorage.getItem('access_token');
+                            if (newToken) {
+                                resolve(newToken);
+                            } else {
+                                reject(new Error('Token refresh failed'));
+                            }
+                        }
+                    }, 100);
+                });
+            }
+
+            isRefreshingToken = true;
+            
+            // Update UI to show refreshing status
+            const authStatusElement = document.getElementById('authStatus');
+            if (authStatusElement) {
+                authStatusElement.innerHTML = 
+                    '<span class="status-indicator status-refreshing"></span>Refreshing token...';
+                authStatusElement.style.color = '#f39c12';
+            }
+            
+            try {
+                const refreshToken = localStorage.getItem('refresh_token');
+                if (!refreshToken) {
+                    throw new Error('No refresh token available');
+                }
+
+                console.log('🔄 Attempting to refresh access token...');
+                
+                const response = await fetch(`${API_BASE}/api/auth/refresh`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        refresh_token: refreshToken
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`Token refresh failed: ${errorData.detail || 'Unknown error'}`);
+                }
+
+                const data = await response.json();
+                const { access_token, refresh_token: newRefreshToken } = data;
+
+                // Update tokens in localStorage
+                localStorage.setItem('access_token', access_token);
+                if (newRefreshToken) {
+                    localStorage.setItem('refresh_token', newRefreshToken);
+                }
+
+                console.log('✅ Access token refreshed successfully');
+                
+                // Update UI to show refreshed status
+                if (authStatusElement) {
+                    authStatusElement.innerHTML = 
+                        '<span class="status-indicator status-connected"></span>Authenticated (Token Refreshed)';
+                    authStatusElement.style.color = '#27ae60';
+                }
+                
+                return access_token;
+
+            } catch (error) {
+                console.error('❌ Token refresh failed:', error);
+                
+                // Clear invalid tokens
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('refresh_token');
+                
+                // Update UI to show authentication is required
+                document.getElementById('authStatus').innerHTML = 
+                    '<span class="status-indicator status-disconnected"></span>Authentication Required - Please log in again';
+                document.getElementById('authStatus').style.color = '#e74c3c';
+                
+                throw error;
+            } finally {
+                isRefreshingToken = false;
+            }
+        }
+
         function showResult(elementId, data, isError = false) {
             const element = document.getElementById(elementId);
             element.style.display = 'block';
@@ -753,7 +854,9 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
             element.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
         }
 
-        async function makeRequest(url, options = {}) {
+        async function makeRequest(url, options = {}, retryCount = 0) {
+            const maxRetries = 1; // Only retry once after token refresh
+            
             try {
                 const response = await fetch(url, {
                     ...options,
@@ -763,6 +866,24 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
                     }
                 });
                 
+                // Check if we got a 401 Unauthorized response
+                if (response.status === 401 && retryCount < maxRetries) {
+                    console.log('🔄 Received 401, attempting token refresh...');
+                    
+                    try {
+                        // Try to refresh the token
+                        await refreshAccessToken();
+                        
+                        // Retry the original request with the new token
+                        console.log('🔄 Retrying request with refreshed token...');
+                        return await makeRequest(url, options, retryCount + 1);
+                        
+                    } catch (refreshError) {
+                        console.error('❌ Token refresh failed, cannot retry request:', refreshError);
+                        throw new Error('Authentication failed. Please log in again.');
+                    }
+                }
+                
                 const data = await response.json();
                 
                 if (!response.ok) {
@@ -770,6 +891,105 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
                 }
                 
                 return data;
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        async function makeFormDataRequest(url, options = {}, retryCount = 0) {
+            const maxRetries = 1; // Only retry once after token refresh
+            
+            try {
+                const token = localStorage.getItem('access_token') || document.getElementById('authToken').value;
+                if (!token) {
+                    throw new Error('No authentication token found');
+                }
+
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        // Note: Don't set Content-Type for FormData - browser will set it with boundary
+                        ...options.headers
+                    }
+                });
+                
+                // Check if we got a 401 Unauthorized response
+                if (response.status === 401 && retryCount < maxRetries) {
+                    console.log('🔄 Received 401 in FormData request, attempting token refresh...');
+                    
+                    try {
+                        // Try to refresh the token
+                        await refreshAccessToken();
+                        
+                        // Retry the original request with the new token
+                        console.log('🔄 Retrying FormData request with refreshed token...');
+                        return await makeFormDataRequest(url, options, retryCount + 1);
+                        
+                    } catch (refreshError) {
+                        console.error('❌ Token refresh failed, cannot retry FormData request:', refreshError);
+                        throw new Error('Authentication failed. Please log in again.');
+                    }
+                }
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${data.detail || data.message || 'Unknown error'}`);
+                }
+                
+                return data;
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        async function makeRequestWithFileDownload(url, options = {}, retryCount = 0) {
+            const maxRetries = 1; // Only retry once after token refresh
+            
+            try {
+                const token = localStorage.getItem('access_token') || document.getElementById('authToken').value;
+                if (!token) {
+                    throw new Error('No authentication token found');
+                }
+
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        ...options.headers
+                    }
+                });
+                
+                // Check if we got a 401 Unauthorized response
+                if (response.status === 401 && retryCount < maxRetries) {
+                    console.log('🔄 Received 401 in file download request, attempting token refresh...');
+                    
+                    try {
+                        // Try to refresh the token
+                        await refreshAccessToken();
+                        
+                        // Retry the original request with the new token
+                        console.log('🔄 Retrying file download request with refreshed token...');
+                        return await makeRequestWithFileDownload(url, options, retryCount + 1);
+                        
+                    } catch (refreshError) {
+                        console.error('❌ Token refresh failed, cannot retry file download request:', refreshError);
+                        throw new Error('Authentication failed. Please log in again.');
+                    }
+                }
+                
+                if (!response.ok) {
+                    // Try to parse as JSON for error message
+                    try {
+                        const errorData = await response.json();
+                        throw new Error(`HTTP ${response.status}: ${errorData.detail || errorData.message || 'Unknown error'}`);
+                    } catch (parseError) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                }
+                
+                return response; // Return the response object for file downloads
             } catch (error) {
                 throw error;
             }
@@ -786,6 +1006,26 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
                     '<span class="status-indicator status-disconnected"></span>Authentication Failed';
                 document.getElementById('authStatus').style.color = '#e74c3c';
                 showResult('authStatus', error.message, true);
+            }
+        }
+
+        async function testTokenRefresh() {
+            try {
+                const refreshToken = localStorage.getItem('refresh_token');
+                if (!refreshToken) {
+                    throw new Error('No refresh token available. Please log in to the main application first.');
+                }
+                
+                console.log('🧪 Testing token refresh manually...');
+                await refreshAccessToken();
+                
+                // Test authentication with the new token
+                await makeRequest(`${API_BASE}/api/me`);
+                
+                showResult('authStatus', 'Token refresh test successful! New token is working.', false);
+            } catch (error) {
+                console.error('Token refresh test failed:', error);
+                showResult('authStatus', `Token refresh test failed: ${error.message}`, true);
             }
         }
 
@@ -989,32 +1229,10 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
                     console.log(`${key}:`, value);
                 }
 
-                const token = localStorage.getItem('access_token') || document.getElementById('authToken').value;
-                if (!token) {
-                    throw new Error('No authentication token found');
-                }
-
-                console.log('Sending request to:', `${API_BASE}/api/jobs/update`);
-                console.log('Authorization token:', token.substring(0, 20) + '...');
-
-                const response = await fetch(`${API_BASE}/api/jobs/update`, {
+                const data = await makeFormDataRequest(`${API_BASE}/api/jobs/update`, {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                        // Note: Don't set Content-Type for FormData - browser will set it with boundary
-                    },
                     body: formData
                 });
-
-                console.log('Response status:', response.status);
-                console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-
-                const data = await response.json();
-                console.log('Response data:', data);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${data.detail || data.message || 'Unknown error'}`);
-                }
 
                 showResult('updateJobResult', data);
                 
@@ -1049,25 +1267,11 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
                 
                 const formData = new FormData();
                 formData.append('data', JSON.stringify(requestData));
-                
-                const token = localStorage.getItem('access_token') || document.getElementById('authToken').value;
-                if (!token) {
-                    throw new Error('No authentication token found');
-                }
 
-                const response = await fetch(`${API_BASE}/api/jobs/update`, {
+                const data = await makeFormDataRequest(`${API_BASE}/api/jobs/update`, {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
                     body: formData
                 });
-
-                const data = await response.json();
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${data.detail || data.message || 'Unknown error'}`);
-                }
                 
                 showResult('markJobReadyResult', data);
                 
@@ -1096,22 +1300,9 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
                     throw new Error('Please enter a job ID');
                 }
                 
-                const token = localStorage.getItem('access_token') || document.getElementById('authToken').value;
-                if (!token) {
-                    throw new Error('No authentication token found');
-                }
-
-                const response = await fetch(`${API_BASE}/api/jobs/${jobId}/calibration`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                const response = await makeRequestWithFileDownload(`${API_BASE}/api/jobs/${jobId}/calibration`, {
+                    method: 'GET'
                 });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`HTTP ${response.status}: ${errorData.detail || errorData.message || 'Unknown error'}`);
-                }
 
                 // Check if response is a file download (content-type indicates file)
                 const contentType = response.headers.get('content-type');
@@ -1298,11 +1489,6 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
         }
 
         async function uploadSingleFile(jobId, file, targetName, progressCallback) {
-            const token = localStorage.getItem('access_token') || document.getElementById('authToken').value;
-            if (!token) {
-                throw new Error('No authentication token found');
-            }
-
             const formData = new FormData();
             formData.append('data', JSON.stringify({
                 job_id: jobId,
@@ -1320,22 +1506,13 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
             }, 200);
 
             try {
-                const response = await fetch(`${API_BASE}/api/jobs/update`, {
+                const data = await makeFormDataRequest(`${API_BASE}/api/jobs/update`, {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
                     body: formData
                 });
 
                 clearInterval(progressInterval);
                 progressCallback(100);
-
-                const data = await response.json();
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${data.detail || data.message || 'Unknown error'}`);
-                }
 
                 return data;
             } catch (error) {
