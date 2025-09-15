@@ -242,46 +242,18 @@
             color: #fff;
         }
         
-        .auth-simulation {
-            background: #e6fffa;
-            border: 2px solid #38b2ac;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 15px 0;
-        }
-        
-        .auth-simulation h4 {
-            color: #234e52;
-            margin-top: 0;
-        }
-        
-        .simulate-auth-btn {
-            background: #38b2ac;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            margin: 5px;
-        }
-        
-        .simulate-auth-btn:hover {
-            background: #319795;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🎵 Umami Audio Device Flow Test App</h1>
-        <div class="enhancement-badge">✨ Enhanced with Auto-Completion</div>
+        <div class="enhancement-badge">✨ Enhanced Device Flow Testing</div>
         
         <div class="feature-highlight">
             <h4>🚀 Features Tested:</h4>
             <ul>
                 <li><strong>RFC 8628 Compliance:</strong> Proper OAuth 2.0 Device Authorization Grant implementation</li>
                 <li><strong>History API Routing:</strong> Clean URLs without hash fragments (e.g., /device instead of /#/device)</li>
-                <li><strong>Auto-Completion:</strong> If user is already logged in, device flow completes automatically</li>
                 <li><strong>AJAX Integration:</strong> Frontend uses AJAX calls instead of form submissions</li>
                 <li><strong>Static Site Compatible:</strong> Works with GitHub Pages static hosting</li>
                 <li><strong>Enhanced Error Handling:</strong> Comprehensive error codes and descriptions</li>
@@ -313,20 +285,10 @@
                 <a id="verificationUrl" href="#" target="_blank"></a>
             </div>
             <button id="openBrowser" onclick="openVerificationUrl()">🌐 Open Browser (Auto-Submit)</button>
-            <button onclick="simulateAuthenticatedUser()">👤 Simulate Already Logged-In User</button>
             <button onclick="startPolling()">🔄 Start Polling for Completion</button>
             <div id="step2Status"></div>
         </div>
         
-        <!-- Authentication Simulation -->
-        <div class="auth-simulation" id="authSimulation" style="display: none;">
-            <h4>🧪 Authentication Simulation</h4>
-            <p>Simulate different authentication scenarios to test the enhanced flow:</p>
-            <button class="simulate-auth-btn" onclick="simulateAutoComplete()">⚡ Auto-Complete (Already Logged In)</button>
-            <button class="simulate-auth-btn" onclick="simulateManualAuth()">🔐 Manual Authentication Required</button>
-            <button class="simulate-auth-btn" onclick="simulateAuthError()">❌ Authentication Error</button>
-            <div id="authSimStatus"></div>
-        </div>
         
         <!-- Step 3: Polling Status -->
         <div class="step" id="step3" style="display: none;">
@@ -347,15 +309,6 @@
             <button onclick="resetFlow()">🔄 Start New Flow</button>
         </div>
         
-        <!-- Auto-Complete Success -->
-        <div class="step auto-complete" id="stepAutoComplete" style="display: none;">
-            <h3>⚡ Auto-Completion Successful! 🎉</h3>
-            <div class="status auto-complete">
-                <strong>🚀 Enhanced Feature:</strong> User was already authenticated, so the device flow completed automatically without requiring additional login steps!
-            </div>
-            <div class="user-info" id="autoCompleteUserInfo"></div>
-            <button onclick="resetFlow()">🔄 Test Another Flow</button>
-        </div>
         
         <!-- Request/Response Log -->
         <div class="step">
@@ -453,9 +406,8 @@
                 document.getElementById('verificationUrl').href = verificationUriComplete;
                 document.getElementById('verificationUrl').textContent = verificationUriComplete;
                 
-                // Show step 2 and auth simulation
+                // Show step 2
                 document.getElementById('step2').style.display = 'block';
-                document.getElementById('authSimulation').style.display = 'block';
                 document.getElementById('requestCode').disabled = true;
                 
                 log(`✅ Device code generated: ${deviceCode.substring(0, 20)}...`, 'success');
@@ -479,111 +431,8 @@
             }
         }
         
-        // Simulate already authenticated user
-        async function simulateAuthenticatedUser() {
-            log('👤 Simulating already authenticated user scenario...', 'info');
-            
-            try {
-                const response = await fetch(`${API_BASE}/api/auth/device/verify`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        // Simulate having an auth token
-                        'Authorization': 'Bearer simulated_token_for_testing'
-                    },
-                    body: JSON.stringify({
-                        user_code: userCode
-                    })
-                });
-                
-                log(`📤 POST ${API_BASE}/api/auth/device/verify (with auth simulation)`, 'request');
-                log(`📤 Request Body: ${JSON.stringify({user_code: userCode}, null, 2)}`, 'request');
-                
-                const data = await response.json();
-                log(`📥 Response (${response.status}): ${JSON.stringify(data, null, 2)}`, 'response');
-                
-                if (data.auto_completed) {
-                    log('⚡ Auto-completion detected!', 'success');
-                    showAutoComplete(data);
-                } else {
-                    log('🔐 Manual authentication required', 'info');
-                    sessionId = data.session_id;
-                    document.getElementById('step2Status').innerHTML = 
-                        '<div class="status pending">🔐 Manual authentication required. Session created.</div>';
-                }
-                
-            } catch (error) {
-                log(`❌ Error in authentication simulation: ${error.message}`, 'error');
-            }
-        }
         
-        // Authentication simulation functions
-        async function simulateAutoComplete() {
-            log('⚡ Simulating auto-completion scenario...', 'info');
-            
-            const mockResponse = {
-                success: true,
-                message: "Authentication completed automatically",
-                auto_completed: true,
-                user: {
-                    id: 123,
-                    email: "test@example.com",
-                    name: "Test User"
-                }
-            };
-            
-            log(`📥 Simulated Response: ${JSON.stringify(mockResponse, null, 2)}`, 'response');
-            showAutoComplete(mockResponse);
-        }
         
-        async function simulateManualAuth() {
-            log('🔐 Simulating manual authentication scenario...', 'info');
-            
-            const mockResponse = {
-                success: true,
-                message: "User code verified. Please complete authentication.",
-                session_id: 42,
-                auto_completed: false
-            };
-            
-            log(`📥 Simulated Response: ${JSON.stringify(mockResponse, null, 2)}`, 'response');
-            sessionId = mockResponse.session_id;
-            
-            document.getElementById('authSimStatus').innerHTML = 
-                '<div class="status pending">🔐 Manual authentication required. User must complete login process.</div>';
-        }
-        
-        async function simulateAuthError() {
-            log('❌ Simulating authentication error scenario...', 'error');
-            
-            const mockError = {
-                detail: "Invalid user code or session expired"
-            };
-            
-            log(`📥 Simulated Error Response: ${JSON.stringify(mockError, null, 2)}`, 'error');
-            
-            document.getElementById('authSimStatus').innerHTML = 
-                '<div class="status error">❌ Authentication error: Invalid user code or session expired</div>';
-        }
-        
-        // Show auto-complete success
-        function showAutoComplete(data) {
-            document.getElementById('stepAutoComplete').style.display = 'block';
-            document.getElementById('step2Status').innerHTML = 
-                '<div class="status auto-complete">⚡ Authentication completed automatically!</div>';
-            
-            // Display user info
-            document.getElementById('autoCompleteUserInfo').innerHTML = `
-                <h4>👤 Auto-Authenticated User:</h4>
-                <p><strong>Name:</strong> ${data.user.name}</p>
-                <p><strong>Email:</strong> ${data.user.email}</p>
-                <p><strong>ID:</strong> ${data.user.id}</p>
-                <p><strong>Auto-Completion:</strong> ✅ Yes</p>
-            `;
-            
-            log('⚡ Auto-completion flow completed successfully!', 'success');
-            log(`👤 Auto-authenticated as: ${data.user.name} (${data.user.email})`, 'success');
-        }
         
         // Step 3: Start Polling
         function startPolling() {
@@ -786,7 +635,7 @@
             log('🔐 Testing authenticated API request...', 'info');
             
             try {
-                const response = await fetch(`${API_BASE}/api/user/profile`, {
+                const response = await fetch(`${API_BASE}/api/users/profile`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${accessToken}`,
@@ -794,7 +643,7 @@
                     }
                 });
                 
-                log(`📤 GET ${API_BASE}/api/user/profile`, 'request');
+                log(`📤 GET ${API_BASE}/api/users/profile`, 'request');
                 log(`📤 Authorization: Bearer ${accessToken.substring(0, 20)}...`, 'request');
                 
                 if (response.ok) {
@@ -832,12 +681,9 @@
             document.getElementById('step2').style.display = 'none';
             document.getElementById('step3').style.display = 'none';
             document.getElementById('step4').style.display = 'none';
-            document.getElementById('stepAutoComplete').style.display = 'none';
-            document.getElementById('authSimulation').style.display = 'none';
             document.getElementById('requestCode').disabled = false;
             document.getElementById('step1Status').innerHTML = '';
             document.getElementById('step2Status').innerHTML = '';
-            document.getElementById('authSimStatus').innerHTML = '';
             
             log('🔄 Flow reset. Ready to start new authentication.', 'info');
         }
@@ -847,7 +693,7 @@
         log(`🌐 API Base URL: ${API_BASE}`, 'info');
         log(`🌐 Frontend Base URL: ${FRONTEND_BASE}`, 'info');
         log(`🔑 Client ID: ${CLIENT_ID}`, 'info');
-        log('✨ Features: RFC 8628 compliance, History API routing, auto-completion, enhanced error handling', 'success');
+        log('✨ Features: RFC 8628 compliance, History API routing, enhanced error handling', 'success');
         log('🚀 Ready to test OAuth 2.0 Device Authorization Grant flow!', 'info');
         log('Click "Start Authentication Flow" to begin testing!', 'info');
     </script>
