@@ -18,8 +18,7 @@
     <script type="text/javascript">
       // Decode GitHub Pages SPA routing parameters
       (function(l) {
-        // Only process if we have a search parameter that starts with '/' and doesn't already contain '~and~'
-        if (l.search[1] === '/' && !l.search.includes('~and~')) {
+        if (l.search.indexOf('/') !== -1) {
           var decoded = l.search.slice(1).split('&').map(function(s) { 
             return s.replace(/~and~/g, '&')
           }).join('?');
@@ -35,6 +34,7 @@
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
+    <div id="root"></div>
+
   </body>
 </html>
