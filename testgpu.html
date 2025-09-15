@@ -1258,11 +1258,13 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
                 const requestData = {
                     job_id: jobId,
                     task: "ready",
-                    speaker_names: speakerNames,
-                    is_subwoofer: isSubwoofer,
-                    bitdepth: bitdepth,
-                    sampling_rate: samplingRate,
-                    sweep_params: sweepParams
+                    meta: {
+                        speaker_names: speakerNames,
+                        is_subwoofer: isSubwoofer,
+                        bitdepth: bitdepth,
+                        sampling_rate: samplingRate,
+                        sweep_params: sweepParams
+                    }
                 };
                 
                 const formData = new FormData();
