@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Umami Audio - Perfect Soup Speaker Calibration"
+    />
+    <title>Umami Audio - Perfect Soup</title>
+    
+    <!-- Content Security Policy for GitHub Pages compatibility -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' https:; connect-src 'self' https: wss:; frame-src 'self' https:;">
+
+    <!-- Single Page Apps for GitHub Pages - URL parameter handling -->
+    <script type="text/javascript">
+      // Decode GitHub Pages SPA routing parameters
+      (function(l) {
+        // Only process if we have a search parameter that starts with '/' and doesn't already contain '~and~'
+        if (l.search[1] === '/' && !l.search.includes('~and~')) {
+          var decoded = l.search.slice(1).split('&').map(function(s) { 
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          window.history.replaceState(null, null,
+              l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location))
+    </script>
+
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
