@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Umami Audio - Perfect Soup Speaker Calibration</title>
+    <meta name="description" content="ML-powered speaker calibration software that neutralizes room modes, reduces early reflections, manages crossovers, and equalizes speaker response to achieve free field response in any room.">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Custom animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-gray-900">Umami Audio</h1>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="hidden md:flex space-x-8">
+                    <button onclick="scrollToSection('hero')" class="text-gray-900 font-medium px-3 py-2 text-sm">Home</button>
+                    <a href="download.html" class="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium">Download</a>
+                    <button onclick="scrollToSection('features')" class="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium">Features</button>
+                    <button onclick="scrollToSection('how-it-works')" class="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium">How it Works</button>
+                </nav>
+
+                <!-- Auth Section -->
+                <div class="flex items-center space-x-4">
+                    <div id="auth-section">
+                        <div id="loading-auth" class="w-24 h-10 bg-gray-200 animate-pulse rounded-md"></div>
+                        <button id="login-btn" onclick="redirectToDashboard()" class="hidden bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors">
+                            Login/Sign Up
+                        </button>
+                        <button id="dashboard-btn" onclick="redirectToDashboard()" class="hidden bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors">
+                            Dashboard
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="hero" class="min-h-screen gradient-bg flex items-center">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center text-white">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6 fade-in-up">
+                Perfect Soup
+                <span class="text-yellow-300">Speaker Calibration</span>
+            </h1>
+            
+            <p class="text-xl mb-8 max-w-3xl mx-auto opacity-90 fade-in-up" style="animation-delay: 0.2s;">
+                ML-powered speaker calibration software that neutralizes room modes, reduces early reflections, 
+                manages crossovers, and equalizes speaker response to achieve free field response in any room.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center fade-in-up" style="animation-delay: 0.4s;">
+                <div id="hero-auth-section">
+                    <div id="hero-loading" class="w-32 h-12 bg-white/20 animate-pulse rounded-lg mx-auto"></div>
+                    <button id="hero-login-btn" onclick="redirectToDashboard()" class="hidden bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-medium hover:bg-gray-100 transform hover:scale-105 transition-all duration-200">
+                        Get Started
+                    </button>
+                    <button id="hero-dashboard-btn" onclick="redirectToDashboard()" class="hidden bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-medium hover:bg-gray-100 transform hover:scale-105 transition-all duration-200">
+                        Go to Dashboard
+                    </button>
+                </div>
+                
+                <a href="download.html" class="border border-white text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-white hover:text-blue-600 transform hover:scale-105 transition-all duration-200">
+                    Download Software
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">
+                    Advanced Audio Features
+                </h2>
+                <p class="text-lg text-gray-600">
+                    Professional speaker calibration with cutting-edge ML technology
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Feature cards -->
+                <div class="bg-gray-50 p-6 rounded-xl hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Room Mode Neutralization</h3>
+                    <p class="text-gray-600">Advanced ML algorithms neutralize problematic room modes and acoustic anomalies for pristine sound.</p>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-xl hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Crossover Management</h3>
+                    <p class="text-gray-600">Intelligent crossover optimization and multi-subwoofer integration for seamless frequency response.</p>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-xl hover:shadow-md transition-shadow">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Free Field Response</h3>
+                    <p class="text-gray-600">Achieve true free field response in any room environment with precision equalization and reflection control.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it Works Section -->
+    <section id="how-it-works" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
+                <p class="text-lg text-gray-600">Simple steps to calibrate your speakers</p>
+            </div>
+
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">1</div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Register License</h3>
+                    <p class="text-gray-600">Create your account and register your Perfect Soup license</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">2</div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Room Analysis</h3>
+                    <p class="text-gray-600">Measure your room acoustics and speaker positioning</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">3</div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">ML Processing</h3>
+                    <p class="text-gray-600">Our ML algorithms analyze and create optimal calibration settings</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">4</div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Perfect Sound</h3>
+                    <p class="text-gray-600">Apply calibration and enjoy pristine free field response</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-blue-600">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl font-bold text-white mb-4">Ready to perfect your sound?</h2>
+            <p class="text-xl text-blue-100 mb-8">Join audio professionals who trust Perfect Soup for pristine speaker calibration</p>
+            <div id="cta-auth-section">
+                <div id="cta-loading" class="w-48 h-12 bg-white/20 animate-pulse rounded-lg mx-auto"></div>
+                <button id="cta-login-btn" onclick="redirectToDashboard()" class="hidden bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-medium hover:bg-gray-50 transform hover:scale-105 transition-all duration-200 inline-block">
+                    Start Calibrating Now
+                </button>
+                <button id="cta-dashboard-btn" onclick="redirectToDashboard()" class="hidden bg-white text-blue-600 px-8 py-3 rounded-lg text-lg font-medium hover:bg-gray-50 transform hover:scale-105 transition-all duration-200 inline-block">
+                    Go to Dashboard
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Umami Audio</h3>
+                    <p class="text-gray-400">Professional speaker calibration software for perfect sound reproduction in any environment.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Product</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><button onclick="scrollToSection('features')" class="hover:text-white">Features</button></li>
+                        <li><a href="download.html" class="hover:text-white">Download</a></li>
+                        <li><button onclick="redirectToDashboard()" class="hover:text-white">Dashboard</button></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white">Documentation</a></li>
+                        <li><a href="#" class="hover:text-white">API Reference</a></li>
+                        <li><a href="#" class="hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Connect</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white">GitHub</a></li>
+                        <li><a href="#" class="hover:text-white">Twitter</a></li>
+                        <li><a href="#" class="hover:text-white">Discord</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 Umami Audio. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            BACKEND_URL: 'https://udev-backend.teeramusic.com:15351',
+            FRONTEND_URL: 'https://udev.teeramusic.com'
+        };
+
+        // Auth state
+        let isAuthenticated = false;
+        let isLoading = true;
+
+        // Check authentication status via AJAX
+        async function checkAuthStatus() {
+            try {
+                // Check if we have a token in localStorage (from previous session)
+                const token = localStorage.getItem('access_token');
+                if (!token) {
+                    showUnauthenticated();
+                    return;
+                }
+
+                // Verify token with backend
+                const response = await fetch(`${CONFIG.BACKEND_URL}/api/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    isAuthenticated = true;
+                    showAuthenticated();
+                } else {
+                    // Token is invalid, remove it
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('refresh_token');
+                    showUnauthenticated();
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                showUnauthenticated();
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        function showAuthenticated() {
+            // Hide loading indicators
+            document.getElementById('loading-auth').classList.add('hidden');
+            document.getElementById('hero-loading').classList.add('hidden');
+            document.getElementById('cta-loading').classList.add('hidden');
+
+            // Show dashboard buttons
+            document.getElementById('dashboard-btn').classList.remove('hidden');
+            document.getElementById('hero-dashboard-btn').classList.remove('hidden');
+            document.getElementById('cta-dashboard-btn').classList.remove('hidden');
+
+            // Hide login buttons
+            document.getElementById('login-btn').classList.add('hidden');
+            document.getElementById('hero-login-btn').classList.add('hidden');
+            document.getElementById('cta-login-btn').classList.add('hidden');
+        }
+
+        function showUnauthenticated() {
+            // Hide loading indicators
+            document.getElementById('loading-auth').classList.add('hidden');
+            document.getElementById('hero-loading').classList.add('hidden');
+            document.getElementById('cta-loading').classList.add('hidden');
+
+            // Show login buttons
+            document.getElementById('login-btn').classList.remove('hidden');
+            document.getElementById('hero-login-btn').classList.remove('hidden');
+            document.getElementById('cta-login-btn').classList.remove('hidden');
+
+            // Hide dashboard buttons
+            document.getElementById('dashboard-btn').classList.add('hidden');
+            document.getElementById('hero-dashboard-btn').classList.add('hidden');
+            document.getElementById('cta-dashboard-btn').classList.add('hidden');
+        }
+
+        function redirectToDashboard() {
+            if (isAuthenticated) {
+                // If authenticated, go to dashboard
+                window.location.href = `${CONFIG.FRONTEND_URL}/dashboard/`;
+            } else {
+                // If not authenticated, go to login page
+                window.location.href = `${CONFIG.FRONTEND_URL}/dashboard/login`;
+            }
+        }
+
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+
+        // Check if this is a dashboard URL that should be redirected
+        function checkForDashboardRedirect() {
+            const currentPath = window.location.pathname + window.location.search;
+            
+            // Check for malformed URLs like /?/dashboard/...
+            if (currentPath.includes('/dashboard/') || window.location.search.includes('/dashboard/')) {
+                // Extract the dashboard path
+                let dashboardPath = '';
+                
+                if (currentPath.includes('?/dashboard/')) {
+                    // Handle malformed URL like /?/dashboard/device&code=...
+                    dashboardPath = currentPath.split('?/dashboard/')[1];
+                    // Fix parameter encoding
+                    dashboardPath = dashboardPath.replace(/~and~/g, '&');
+                } else if (currentPath.includes('/dashboard/')) {
+                    // Handle normal dashboard URLs
+                    dashboardPath = currentPath.split('/dashboard/')[1];
+                }
+                
+                if (dashboardPath) {
+                    // Redirect to proper dashboard URL
+                    const newUrl = `${CONFIG.FRONTEND_URL}/dashboard/${dashboardPath}`;
+                    console.log('Redirecting malformed URL to:', newUrl);
+                    window.location.href = newUrl;
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
+        // Initialize auth check on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // First check if this should be redirected to dashboard
+            if (checkForDashboardRedirect()) {
+                return; // Don't continue if redirecting
+            }
+            
+            checkAuthStatus();
+
+            // Add scroll-based animations
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+            // Observe feature cards for animation
+            document.querySelectorAll('.grid > div').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>

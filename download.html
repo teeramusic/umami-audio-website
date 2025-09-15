@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download - Umami Audio Perfect Soup</title>
+    <meta name="description" content="Download Perfect Soup speaker calibration software for Windows, macOS, and Linux">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="index.html" class="text-2xl font-bold text-gray-900">Umami Audio</a>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="index.html" class="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium">Home</a>
+                    <a href="#" class="text-gray-900 font-medium px-3 py-2 text-sm">Download</a>
+                    <a href="index.html#features" class="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium">Features</a>
+                    <a href="index.html#how-it-works" class="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium">How it Works</a>
+                </nav>
+
+                <!-- Auth Section -->
+                <div class="flex items-center space-x-4">
+                    <div id="auth-section">
+                        <div id="loading-auth" class="w-24 h-10 bg-gray-200 animate-pulse rounded-md"></div>
+                        <button id="login-btn" onclick="redirectToDashboard()" class="hidden bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors">
+                            Login/Sign Up
+                        </button>
+                        <button id="dashboard-btn" onclick="redirectToDashboard()" class="hidden bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors">
+                            Dashboard
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6">
+                Download Perfect Soup
+            </h1>
+            <p class="text-xl mb-8 max-w-3xl mx-auto opacity-90">
+                Get our desktop client for seamless integration with your workflow. 
+                Available for Windows, macOS, and Linux.
+            </p>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section class="py-20">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Latest Version Info -->
+            <div class="text-center mb-12">
+                <div class="inline-flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium mb-4">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Latest Version: v2.1.0
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900 mb-2">Choose Your Platform</h2>
+                <p class="text-gray-600">Select the appropriate version for your operating system</p>
+            </div>
+
+            <!-- Download Cards -->
+            <div class="grid md:grid-cols-3 gap-8 mb-12">
+                <!-- Windows -->
+                <div class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow">
+                    <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M3 12V6.75l6-1.32v6.48L3 12zm8-7.5V12l9-2.25V1.5L11 4.5zM3 18l6-1.32v-6.48L3 12v6zm8 1.5l9-2.25V12L11 14.25v5.25z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Windows</h3>
+                    <p class="text-gray-600 mb-4">Windows 10/11 (64-bit)</p>
+                    <p class="text-sm text-gray-500 mb-6">Size: 45.2 MB</p>
+                    <button onclick="downloadFile('windows')" class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                        Download for Windows
+                    </button>
+                </div>
+
+                <!-- macOS -->
+                <div class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow">
+                    <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">macOS</h3>
+                    <p class="text-gray-600 mb-4">macOS 10.15+ (Intel/Apple Silicon)</p>
+                    <p class="text-sm text-gray-500 mb-6">Size: 52.1 MB</p>
+                    <button onclick="downloadFile('macos')" class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                        Download for macOS
+                    </button>
+                </div>
+
+                <!-- Linux -->
+                <div class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow">
+                    <div class="w-16 h-16 bg-orange-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-orange-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.568 14.34c-.297.458-.78.577-1.08.26-.301-.317-.13-.78.128-1.303.259-.523.664-1.084.664-1.84 0-.99-.415-1.622-.83-2.153.633.016 1.288.13 1.288 1.33 0 .97-.415 2.25-1.17 2.706z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Linux</h3>
+                    <p class="text-gray-600 mb-4">Ubuntu 18.04+ / CentOS 7+ (64-bit)</p>
+                    <p class="text-sm text-gray-500 mb-6">Size: 48.7 MB</p>
+                    <button onclick="downloadFile('linux')" class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                        Download for Linux
+                    </button>
+                </div>
+            </div>
+
+            <!-- Installation Instructions -->
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6">Installation Instructions</h3>
+                
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Windows Instructions -->
+                    <div>
+                        <h4 class="font-semibold text-lg text-gray-900 mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M3 12V6.75l6-1.32v6.48L3 12zm8-7.5V12l9-2.25V1.5L11 4.5zM3 18l6-1.32v-6.48L3 12v6zm8 1.5l9-2.25V12L11 14.25v5.25z"/>
+                            </svg>
+                            Windows
+                        </h4>
+                        <ol class="text-sm text-gray-600 space-y-2">
+                            <li>1. Download the .exe installer</li>
+                            <li>2. Run the installer as administrator</li>
+                            <li>3. Follow the setup wizard</li>
+                            <li>4. Launch Perfect Soup from desktop or Start menu</li>
+                        </ol>
+                    </div>
+
+                    <!-- macOS Instructions -->
+                    <div>
+                        <h4 class="font-semibold text-lg text-gray-900 mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                            </svg>
+                            macOS
+                        </h4>
+                        <ol class="text-sm text-gray-600 space-y-2">
+                            <li>1. Download the .dmg file</li>
+                            <li>2. Open the downloaded file</li>
+                            <li>3. Drag Perfect Soup to Applications folder</li>
+                            <li>4. Launch from Applications or Launchpad</li>
+                        </ol>
+                    </div>
+
+                    <!-- Linux Instructions -->
+                    <div>
+                        <h4 class="font-semibold text-lg text-gray-900 mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-orange-600" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0z"/>
+                            </svg>
+                            Linux
+                        </h4>
+                        <ol class="text-sm text-gray-600 space-y-2">
+                            <li>1. Download the .deb or .rpm package</li>
+                            <li>2. Install: <code class="bg-gray-100 px-1 rounded">sudo dpkg -i perfect-soup.deb</code></li>
+                            <li>3. Or: <code class="bg-gray-100 px-1 rounded">sudo rpm -i perfect-soup.rpm</code></li>
+                            <li>4. Launch: <code class="bg-gray-100 px-1 rounded">perfect-soup</code></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Requirements -->
+            <div class="bg-gray-50 rounded-xl p-8 mt-8">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6">System Requirements</h3>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="font-semibold text-lg text-gray-900 mb-3">Minimum Requirements</h4>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li>• 4GB RAM</li>
+                            <li>• 500MB free disk space</li>
+                            <li>• Internet connection</li>
+                            <li>• 64-bit operating system</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-semibold text-lg text-gray-900 mb-3">Recommended</h4>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li>• 8GB RAM or more</li>
+                            <li>• 1GB free disk space</li>
+                            <li>• High-speed internet</li>
+                            <li>• Audio interface with measurement microphone</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Need Help -->
+            <div class="text-center mt-12">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Need Help?</h3>
+                <p class="text-gray-600 mb-6">
+                    Check our documentation or contact support if you encounter any issues.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#" class="bg-gray-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-700 transition-colors">
+                        View Documentation
+                    </a>
+                    <a href="#" class="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+                        Contact Support
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Umami Audio</h3>
+                    <p class="text-gray-400">Professional speaker calibration software for perfect sound reproduction in any environment.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Product</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="index.html#features" class="hover:text-white">Features</a></li>
+                        <li><a href="#" class="hover:text-white">Download</a></li>
+                        <li><button onclick="redirectToDashboard()" class="hover:text-white">Dashboard</button></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white">Documentation</a></li>
+                        <li><a href="#" class="hover:text-white">API Reference</a></li>
+                        <li><a href="#" class="hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Connect</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white">GitHub</a></li>
+                        <li><a href="#" class="hover:text-white">Twitter</a></li>
+                        <li><a href="#" class="hover:text-white">Discord</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 Umami Audio. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            BACKEND_URL: 'https://udev-backend.teeramusic.com:15351',
+            FRONTEND_URL: 'https://udev.teeramusic.com'
+        };
+
+        // Auth state
+        let isAuthenticated = false;
+        let isLoading = true;
+
+        // Check authentication status via AJAX
+        async function checkAuthStatus() {
+            try {
+                // Check if we have a token in localStorage (from previous session)
+                const token = localStorage.getItem('access_token');
+                if (!token) {
+                    showUnauthenticated();
+                    return;
+                }
+
+                // Verify token with backend
+                const response = await fetch(`${CONFIG.BACKEND_URL}/api/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    isAuthenticated = true;
+                    showAuthenticated();
+                } else {
+                    // Token is invalid, remove it
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('refresh_token');
+                    showUnauthenticated();
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                showUnauthenticated();
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        function showAuthenticated() {
+            // Hide loading indicators
+            document.getElementById('loading-auth').classList.add('hidden');
+
+            // Show dashboard button
+            document.getElementById('dashboard-btn').classList.remove('hidden');
+
+            // Hide login button
+            document.getElementById('login-btn').classList.add('hidden');
+        }
+
+        function showUnauthenticated() {
+            // Hide loading indicators
+            document.getElementById('loading-auth').classList.add('hidden');
+
+            // Show login button
+            document.getElementById('login-btn').classList.remove('hidden');
+
+            // Hide dashboard button
+            document.getElementById('dashboard-btn').classList.add('hidden');
+        }
+
+        function redirectToDashboard() {
+            if (isAuthenticated) {
+                // If authenticated, go to dashboard
+                window.location.href = `${CONFIG.FRONTEND_URL}/dashboard/`;
+            } else {
+                // If not authenticated, go to login page
+                window.location.href = `${CONFIG.FRONTEND_URL}/dashboard/login`;
+            }
+        }
+
+        function downloadFile(platform) {
+            // This would normally trigger actual downloads
+            // For now, we'll just show an alert
+            const files = {
+                'windows': 'perfect-soup-v2.1.0-windows-x64.exe',
+                'macos': 'perfect-soup-v2.1.0-macos.dmg',
+                'linux': 'perfect-soup-v2.1.0-linux-x64.deb'
+            };
+            
+            alert(`Starting download of ${files[platform]}...\n\nIn a real implementation, this would download the actual software package.`);
+            
+            // In real implementation, you would:
+            // window.location.href = `/downloads/${files[platform]}`;
+            // or trigger a fetch request to download endpoint
+        }
+
+        // Initialize auth check on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthStatus();
+
+            // Add some simple animations
+            const cards = document.querySelectorAll('.shadow-lg');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Umami Audio Device Flow Test App - Enhanced</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+        
+        .enhancement-badge {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        
+        .step {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #4299e1;
+            background: #f7fafc;
+        }
+        
+        .step h3 {
+            margin-top: 0;
+            color: #2d3748;
+        }
+        
+        .step.success {
+            border-left-color: #48bb78;
+            background: #f0fff4;
+        }
+        
+        .step.auto-complete {
+            border-left-color: #ed8936;
+            background: #fffaf0;
+        }
+        
+        button {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #3182ce;
+        }
+        
+        button:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+        }
+        
+        button.success {
+            background: #48bb78;
+        }
+        
+        button.success:hover {
+            background: #38a169;
+        }
+        
+        .code-display {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 24px;
+            text-align: center;
+            letter-spacing: 2px;
+            margin: 15px 0;
+            border: 2px solid #4299e1;
+        }
+        
+        .url-display {
+            background: #f0fff4;
+            border: 1px solid #9ae6b4;
+            padding: 15px;
+            border-radius: 6px;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+        
+        .status {
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        
+        .status.pending {
+            background: #fef5e7;
+            border: 1px solid #f6e05e;
+            color: #744210;
+        }
+        
+        .status.success {
+            background: #f0fff4;
+            border: 1px solid #9ae6b4;
+            color: #22543d;
+        }
+        
+        .status.auto-complete {
+            background: #fffaf0;
+            border: 1px solid #fbb6ce;
+            color: #97266d;
+        }
+        
+        .status.error {
+            background: #fed7d7;
+            border: 1px solid #fc8181;
+            color: #742a2a;
+        }
+        
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin: 15px 0;
+        }
+        
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        
+        .log-entry.request {
+            background: #e3f2fd;
+            border-left: 3px solid #2196f3;
+        }
+        
+        .log-entry.response {
+            background: #f3e5f5;
+            border-left: 3px solid #9c27b0;
+        }
+        
+        .log-entry.info {
+            background: #fff3e0;
+            border-left: 3px solid #ff9800;
+        }
+        
+        .log-entry.success {
+            background: #e8f5e8;
+            border-left: 3px solid #4caf50;
+        }
+        
+        .log-entry.error {
+            background: #ffebee;
+            border-left: 3px solid #f44336;
+        }
+        
+        .token-display {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+        
+        .user-info {
+            background: #e8f5e8;
+            border: 1px solid #4caf50;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .polling-indicator {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4299e1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .countdown {
+            font-size: 18px;
+            font-weight: bold;
+            color: #e53e3e;
+        }
+        
+        .feature-highlight {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .feature-highlight h4 {
+            margin-top: 0;
+            color: #fff;
+        }
+        
+        .auth-simulation {
+            background: #e6fffa;
+            border: 2px solid #38b2ac;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        
+        .auth-simulation h4 {
+            color: #234e52;
+            margin-top: 0;
+        }
+        
+        .simulate-auth-btn {
+            background: #38b2ac;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        
+        .simulate-auth-btn:hover {
+            background: #319795;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Umami Audio Device Flow Test App</h1>
+        <div class="enhancement-badge">✨ Enhanced with Auto-Completion</div>
+        
+        <div class="feature-highlight">
+            <h4>🚀 Features Tested:</h4>
+            <ul>
+                <li><strong>RFC 8628 Compliance:</strong> Proper OAuth 2.0 Device Authorization Grant implementation</li>
+                <li><strong>History API Routing:</strong> Clean URLs without hash fragments (e.g., /device instead of /#/device)</li>
+                <li><strong>Auto-Completion:</strong> If user is already logged in, device flow completes automatically</li>
+                <li><strong>AJAX Integration:</strong> Frontend uses AJAX calls instead of form submissions</li>
+                <li><strong>Static Site Compatible:</strong> Works with GitHub Pages static hosting</li>
+                <li><strong>Enhanced Error Handling:</strong> Comprehensive error codes and descriptions</li>
+                <li><strong>6-Character User Codes:</strong> Simplified format without dashes (e.g., ABCD23)</li>
+            </ul>
+        </div>
+        
+        <!-- Step 1: Request Device Code -->
+        <div class="step">
+            <h3>Step 1: Request Device Code</h3>
+            <p>Simulate a desktop application requesting device authentication codes from the server.</p>
+            <button id="requestCode" onclick="requestDeviceCode()">🚀 Start Authentication Flow</button>
+            <div id="step1Status"></div>
+        </div>
+        
+        <!-- Step 2: Display User Code -->
+        <div class="step" id="step2" style="display: none;">
+            <h3>Step 2: User Code Display</h3>
+            <p>This is what the desktop app would show to the user:</p>
+            <div class="code-display" id="userCodeDisplay"></div>
+            <p><strong>Instructions for User:</strong></p>
+            <ol>
+                <li>Go to the verification URL below</li>
+                <li>Enter the 6-character code shown above (or use auto-submit)</li>
+                <li>Complete authentication (or auto-complete if already logged in)</li>
+            </ol>
+            <div class="url-display">
+                <strong>Verification URL:</strong><br>
+                <a id="verificationUrl" href="#" target="_blank"></a>
+            </div>
+            <button id="openBrowser" onclick="openVerificationUrl()">🌐 Open Browser (Auto-Submit)</button>
+            <button onclick="simulateAuthenticatedUser()">👤 Simulate Already Logged-In User</button>
+            <button onclick="startPolling()">🔄 Start Polling for Completion</button>
+            <div id="step2Status"></div>
+        </div>
+        
+        <!-- Authentication Simulation -->
+        <div class="auth-simulation" id="authSimulation" style="display: none;">
+            <h4>🧪 Authentication Simulation</h4>
+            <p>Simulate different authentication scenarios to test the enhanced flow:</p>
+            <button class="simulate-auth-btn" onclick="simulateAutoComplete()">⚡ Auto-Complete (Already Logged In)</button>
+            <button class="simulate-auth-btn" onclick="simulateManualAuth()">🔐 Manual Authentication Required</button>
+            <button class="simulate-auth-btn" onclick="simulateAuthError()">❌ Authentication Error</button>
+            <div id="authSimStatus"></div>
+        </div>
+        
+        <!-- Step 3: Polling Status -->
+        <div class="step" id="step3" style="display: none;">
+            <h3>Step 3: Polling for Authentication</h3>
+            <p>Desktop app polls the server every 5 seconds to check if user completed authentication.</p>
+            <div id="pollingStatus"></div>
+            <div id="pollCount"></div>
+            <div id="timeRemaining"></div>
+            <button id="stopPolling" onclick="stopPolling()" style="display: none;">⏹️ Stop Polling</button>
+        </div>
+        
+        <!-- Step 4: Success -->
+        <div class="step success" id="step4" style="display: none;">
+            <h3>Step 4: Authentication Complete! 🎉</h3>
+            <div class="user-info" id="userInfo"></div>
+            <div class="token-display" id="tokenDisplay"></div>
+            <button onclick="testAuthenticatedRequest()">🔐 Test Authenticated API Call</button>
+            <button onclick="resetFlow()">🔄 Start New Flow</button>
+        </div>
+        
+        <!-- Auto-Complete Success -->
+        <div class="step auto-complete" id="stepAutoComplete" style="display: none;">
+            <h3>⚡ Auto-Completion Successful! 🎉</h3>
+            <div class="status auto-complete">
+                <strong>🚀 Enhanced Feature:</strong> User was already authenticated, so the device flow completed automatically without requiring additional login steps!
+            </div>
+            <div class="user-info" id="autoCompleteUserInfo"></div>
+            <button onclick="resetFlow()">🔄 Test Another Flow</button>
+        </div>
+        
+        <!-- Request/Response Log -->
+        <div class="step">
+            <h3>📋 Request/Response Log</h3>
+            <button onclick="clearLog()">🗑️ Clear Log</button>
+            <button onclick="exportLog()">📄 Export Log</button>
+            <div class="log" id="logContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE = 'https://udev-backend.teeramusic.com:15351';
+        const FRONTEND_BASE = 'https://udev.teeramusic.com';
+        const CLIENT_ID = 'umami-audio-desktop';
+        
+        // Global state
+        let deviceCode = null;
+        let userCode = null;
+        let verificationUri = null;
+        let verificationUriComplete = null;
+        let pollingInterval = null;
+        let expiresAt = null;
+        let pollCount = 0;
+        let accessToken = null;
+        let refreshToken = null;
+        let userInfo = null;
+        let sessionId = null;
+        
+        // Logging function
+        function log(message, type = 'info') {
+            const logContainer = document.getElementById('logContainer');
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerHTML = `<strong>[${timestamp}]</strong> ${message}`;
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('logContainer').innerHTML = '';
+        }
+        
+        function exportLog() {
+            const logContainer = document.getElementById('logContainer');
+            const logText = logContainer.innerText;
+            const blob = new Blob([logText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `device-flow-test-${new Date().toISOString().slice(0, 19)}.log`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Step 1: Request Device Code
+        async function requestDeviceCode() {
+            log('🚀 Requesting device code from server...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/device/code`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        client_id: CLIENT_ID,
+                        scope: 'profile'
+                    })
+                });
+                
+                log(`📤 POST ${API_BASE}/api/auth/device/code`, 'request');
+                log(`📤 Request Body: ${JSON.stringify({client_id: CLIENT_ID, scope: 'profile'}, null, 2)}`, 'request');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                log(`📥 Response (${response.status}): ${JSON.stringify(data, null, 2)}`, 'response');
+                
+                // Store the response data
+                deviceCode = data.device_code;
+                userCode = data.user_code;
+                verificationUri = data.verification_uri;
+                verificationUriComplete = data.verification_uri_complete;
+                expiresAt = Date.now() + (data.expires_in * 1000);
+                
+                // Update UI
+                document.getElementById('step1Status').innerHTML = 
+                    '<div class="status success">✅ Device code received successfully!</div>';
+                    
+                document.getElementById('userCodeDisplay').textContent = userCode;
+                document.getElementById('verificationUrl').href = verificationUriComplete;
+                document.getElementById('verificationUrl').textContent = verificationUriComplete;
+                
+                // Show step 2 and auth simulation
+                document.getElementById('step2').style.display = 'block';
+                document.getElementById('authSimulation').style.display = 'block';
+                document.getElementById('requestCode').disabled = true;
+                
+                log(`✅ Device code generated: ${deviceCode.substring(0, 20)}...`, 'success');
+                log(`👤 User code (6 chars): ${userCode}`, 'info');
+                log(`🌐 Verification URL: ${verificationUriComplete}`, 'info');
+                
+            } catch (error) {
+                log(`❌ Error requesting device code: ${error.message}`, 'error');
+                document.getElementById('step1Status').innerHTML = 
+                    `<div class="status error">❌ Error: ${error.message}</div>`;
+            }
+        }
+        
+        // Open verification URL
+        function openVerificationUrl() {
+            if (verificationUriComplete) {
+                window.open(verificationUriComplete, '_blank');
+                log(`🌐 Opened browser to: ${verificationUriComplete}`, 'info');
+                document.getElementById('step2Status').innerHTML = 
+                    '<div class="status pending">🌐 Browser opened. Please complete authentication in the new tab.</div>';
+            }
+        }
+        
+        // Simulate already authenticated user
+        async function simulateAuthenticatedUser() {
+            log('👤 Simulating already authenticated user scenario...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/device/verify`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Simulate having an auth token
+                        'Authorization': 'Bearer simulated_token_for_testing'
+                    },
+                    body: JSON.stringify({
+                        user_code: userCode
+                    })
+                });
+                
+                log(`📤 POST ${API_BASE}/api/auth/device/verify (with auth simulation)`, 'request');
+                log(`📤 Request Body: ${JSON.stringify({user_code: userCode}, null, 2)}`, 'request');
+                
+                const data = await response.json();
+                log(`📥 Response (${response.status}): ${JSON.stringify(data, null, 2)}`, 'response');
+                
+                if (data.auto_completed) {
+                    log('⚡ Auto-completion detected!', 'success');
+                    showAutoComplete(data);
+                } else {
+                    log('🔐 Manual authentication required', 'info');
+                    sessionId = data.session_id;
+                    document.getElementById('step2Status').innerHTML = 
+                        '<div class="status pending">🔐 Manual authentication required. Session created.</div>';
+                }
+                
+            } catch (error) {
+                log(`❌ Error in authentication simulation: ${error.message}`, 'error');
+            }
+        }
+        
+        // Authentication simulation functions
+        async function simulateAutoComplete() {
+            log('⚡ Simulating auto-completion scenario...', 'info');
+            
+            const mockResponse = {
+                success: true,
+                message: "Authentication completed automatically",
+                auto_completed: true,
+                user: {
+                    id: 123,
+                    email: "test@example.com",
+                    name: "Test User"
+                }
+            };
+            
+            log(`📥 Simulated Response: ${JSON.stringify(mockResponse, null, 2)}`, 'response');
+            showAutoComplete(mockResponse);
+        }
+        
+        async function simulateManualAuth() {
+            log('🔐 Simulating manual authentication scenario...', 'info');
+            
+            const mockResponse = {
+                success: true,
+                message: "User code verified. Please complete authentication.",
+                session_id: 42,
+                auto_completed: false
+            };
+            
+            log(`📥 Simulated Response: ${JSON.stringify(mockResponse, null, 2)}`, 'response');
+            sessionId = mockResponse.session_id;
+            
+            document.getElementById('authSimStatus').innerHTML = 
+                '<div class="status pending">🔐 Manual authentication required. User must complete login process.</div>';
+        }
+        
+        async function simulateAuthError() {
+            log('❌ Simulating authentication error scenario...', 'error');
+            
+            const mockError = {
+                detail: "Invalid user code or session expired"
+            };
+            
+            log(`📥 Simulated Error Response: ${JSON.stringify(mockError, null, 2)}`, 'error');
+            
+            document.getElementById('authSimStatus').innerHTML = 
+                '<div class="status error">❌ Authentication error: Invalid user code or session expired</div>';
+        }
+        
+        // Show auto-complete success
+        function showAutoComplete(data) {
+            document.getElementById('stepAutoComplete').style.display = 'block';
+            document.getElementById('step2Status').innerHTML = 
+                '<div class="status auto-complete">⚡ Authentication completed automatically!</div>';
+            
+            // Display user info
+            document.getElementById('autoCompleteUserInfo').innerHTML = `
+                <h4>👤 Auto-Authenticated User:</h4>
+                <p><strong>Name:</strong> ${data.user.name}</p>
+                <p><strong>Email:</strong> ${data.user.email}</p>
+                <p><strong>ID:</strong> ${data.user.id}</p>
+                <p><strong>Auto-Completion:</strong> ✅ Yes</p>
+            `;
+            
+            log('⚡ Auto-completion flow completed successfully!', 'success');
+            log(`👤 Auto-authenticated as: ${data.user.name} (${data.user.email})`, 'success');
+        }
+        
+        // Step 3: Start Polling
+        function startPolling() {
+            if (!deviceCode) {
+                log('❌ No device code available. Please request device code first.', 'error');
+                return;
+            }
+            
+            document.getElementById('step3').style.display = 'block';
+            document.getElementById('stopPolling').style.display = 'inline-block';
+            pollCount = 0;
+            
+            log('🔄 Starting polling for authentication completion...', 'info');
+            
+            // Start polling every 5 seconds
+            pollingInterval = setInterval(pollForToken, 5000);
+            
+            // Update countdown timer
+            updateCountdown();
+            const countdownInterval = setInterval(() => {
+                if (!pollingInterval) {
+                    clearInterval(countdownInterval);
+                    return;
+                }
+                updateCountdown();
+            }, 1000);
+            
+            // Initial poll
+            pollForToken();
+        }
+        
+        // Poll for token
+        async function pollForToken() {
+            if (!deviceCode) return;
+            
+            pollCount++;
+            document.getElementById('pollCount').textContent = `Poll attempt: ${pollCount}`;
+            
+            log(`🔄 Polling attempt #${pollCount}...`, 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/device/token`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        client_id: CLIENT_ID,
+                        device_code: deviceCode,
+                        grant_type: 'urn:ietf:params:oauth:grant-type:device_code'
+                    })
+                });
+                
+                log(`📤 POST ${API_BASE}/api/auth/device/token`, 'request');
+                log(`📤 Request Body: ${JSON.stringify({client_id: CLIENT_ID, device_code: deviceCode.substring(0, 20) + '...', grant_type: 'urn:ietf:params:oauth:grant-type:device_code'}, null, 2)}`, 'request');
+                
+                const data = await response.json();
+                log(`📥 Response (${response.status}): ${JSON.stringify(data, null, 2)}`, 'response');
+                
+                if (response.ok && data.access_token) {
+                    // Success! Got tokens
+                    accessToken = data.access_token;
+                    refreshToken = data.refresh_token;
+                    userInfo = data.user;
+                    
+                    stopPolling();
+                    showSuccess();
+                    log('🎉 Tokens received successfully!', 'success');
+                    
+                } else if (response.ok && data.error) {
+                    // Handle RFC 8628 compliant error responses (HTTP 200 with error field)
+                    const error = data.error;
+                    
+                    if (error === 'authorization_pending') {
+                        // Still pending
+                        document.getElementById('pollingStatus').innerHTML = 
+                            '<div class="status pending"><span class="polling-indicator"></span>Waiting for user authentication...</div>';
+                        log('⏳ Authorization still pending...', 'info');
+                        
+                    } else if (error === 'slow_down') {
+                        log('🐌 Polling too fast, slowing down...', 'info');
+                        document.getElementById('pollingStatus').innerHTML = 
+                            '<div class="status pending">🐌 Slowing down polling rate...</div>';
+                            
+                    } else if (error === 'expired_token') {
+                        log('⏰ Device code expired', 'error');
+                        stopPolling();
+                        document.getElementById('pollingStatus').innerHTML = 
+                            '<div class="status error">⏰ Device code expired. Please start over.</div>';
+                            
+                    } else if (error === 'access_denied') {
+                        log('🚫 User denied access', 'error');
+                        stopPolling();
+                        document.getElementById('pollingStatus').innerHTML = 
+                            '<div class="status error">🚫 User denied authorization.</div>';
+                            
+                    } else if (error === 'invalid_grant') {
+                        log('❌ Invalid device code', 'error');
+                        stopPolling();
+                        document.getElementById('pollingStatus').innerHTML = 
+                            '<div class="status error">❌ Invalid device code. Please start over.</div>';
+                            
+                    } else if (error === 'invalid_client') {
+                        log('❌ Invalid client', 'error');
+                        stopPolling();
+                        document.getElementById('pollingStatus').innerHTML = 
+                            '<div class="status error">❌ Invalid client. Check configuration.</div>';
+                            
+                    } else if (error === 'unsupported_grant_type') {
+                        log('❌ Unsupported grant type', 'error');
+                        stopPolling();
+                        document.getElementById('pollingStatus').innerHTML = 
+                            '<div class="status error">❌ Unsupported grant type. Check request format.</div>';
+                            
+                    } else {
+                        log(`❌ Unknown error: ${error}`, 'error');
+                        stopPolling();
+                        document.getElementById('pollingStatus').innerHTML = 
+                            `<div class="status error">❌ Error: ${error}</div>`;
+                    }
+                    
+                } else {
+                    // Unexpected response format
+                    log(`❌ Unexpected response format: ${JSON.stringify(data)}`, 'error');
+                    stopPolling();
+                    document.getElementById('pollingStatus').innerHTML = 
+                        '<div class="status error">❌ Unexpected response from server.</div>';
+                }
+                
+            } catch (error) {
+                log(`❌ Network error during polling: ${error.message}`, 'error');
+                document.getElementById('pollingStatus').innerHTML = 
+                    `<div class="status error">❌ Network error: ${error.message}</div>`;
+            }
+        }
+        
+        // Update countdown timer
+        function updateCountdown() {
+            if (!expiresAt) return;
+            
+            const remaining = Math.max(0, expiresAt - Date.now());
+            const minutes = Math.floor(remaining / 60000);
+            const seconds = Math.floor((remaining % 60000) / 1000);
+            
+            document.getElementById('timeRemaining').innerHTML = 
+                `<div class="countdown">⏰ Time remaining: ${minutes}:${seconds.toString().padStart(2, '0')}</div>`;
+            
+            if (remaining <= 0) {
+                stopPolling();
+                document.getElementById('pollingStatus').innerHTML = 
+                    '<div class="status error">⏰ Device code expired. Please start over.</div>';
+            }
+        }
+        
+        // Stop polling
+        function stopPolling() {
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+                document.getElementById('stopPolling').style.display = 'none';
+                log('⏹️ Stopped polling', 'info');
+            }
+        }
+        
+        // Show success
+        function showSuccess() {
+            document.getElementById('step4').style.display = 'block';
+            document.getElementById('pollingStatus').innerHTML = 
+                '<div class="status success">🎉 Authentication completed successfully!</div>';
+            
+            // Display user info
+            document.getElementById('userInfo').innerHTML = `
+                <h4>👤 Authenticated User:</h4>
+                <p><strong>Name:</strong> ${userInfo.name}</p>
+                <p><strong>Email:</strong> ${userInfo.email}</p>
+                <p><strong>ID:</strong> ${userInfo.id}</p>
+                <p><strong>Provider:</strong> ${userInfo.oauth_provider || 'email'}</p>
+                <p><strong>Verified:</strong> ${userInfo.is_verified ? '✅' : '❌'}</p>
+            `;
+            
+            // Display tokens (truncated for security)
+            document.getElementById('tokenDisplay').innerHTML = `
+                <h4>🔐 JWT Tokens (truncated for display):</h4>
+                <p><strong>Access Token:</strong> ${accessToken.substring(0, 50)}...</p>
+                <p><strong>Refresh Token:</strong> ${refreshToken.substring(0, 50)}...</p>
+                <p><em>Tokens are now stored and can be used for authenticated API calls.</em></p>
+            `;
+            
+            log('🎉 Authentication flow completed successfully!', 'success');
+            log(`👤 Authenticated as: ${userInfo.name} (${userInfo.email})`, 'success');
+        }
+        
+        // Test authenticated request
+        async function testAuthenticatedRequest() {
+            if (!accessToken) {
+                log('❌ No access token available', 'error');
+                return;
+            }
+            
+            log('🔐 Testing authenticated API request...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/user/profile`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                log(`📤 GET ${API_BASE}/api/user/profile`, 'request');
+                log(`📤 Authorization: Bearer ${accessToken.substring(0, 20)}...`, 'request');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`📥 Response (${response.status}): ${JSON.stringify(data, null, 2)}`, 'response');
+                    log('✅ Authenticated request successful!', 'success');
+                } else {
+                    const errorData = await response.json();
+                    log(`📥 Response (${response.status}): ${JSON.stringify(errorData, null, 2)}`, 'response');
+                    log(`❌ Authenticated request failed: ${response.status}`, 'error');
+                }
+                
+            } catch (error) {
+                log(`❌ Error making authenticated request: ${error.message}`, 'error');
+            }
+        }
+        
+        // Reset flow
+        function resetFlow() {
+            stopPolling();
+            
+            // Reset state
+            deviceCode = null;
+            userCode = null;
+            verificationUri = null;
+            verificationUriComplete = null;
+            expiresAt = null;
+            pollCount = 0;
+            accessToken = null;
+            refreshToken = null;
+            userInfo = null;
+            sessionId = null;
+            
+            // Reset UI
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('step3').style.display = 'none';
+            document.getElementById('step4').style.display = 'none';
+            document.getElementById('stepAutoComplete').style.display = 'none';
+            document.getElementById('authSimulation').style.display = 'none';
+            document.getElementById('requestCode').disabled = false;
+            document.getElementById('step1Status').innerHTML = '';
+            document.getElementById('step2Status').innerHTML = '';
+            document.getElementById('authSimStatus').innerHTML = '';
+            
+            log('🔄 Flow reset. Ready to start new authentication.', 'info');
+        }
+        
+        // Initialize
+        log('🎵 Umami Audio Device Flow Test App - RFC 8628 Compliant', 'info');
+        log(`🌐 API Base URL: ${API_BASE}`, 'info');
+        log(`🌐 Frontend Base URL: ${FRONTEND_BASE}`, 'info');
+        log(`🔑 Client ID: ${CLIENT_ID}`, 'info');
+        log('✨ Features: RFC 8628 compliance, History API routing, auto-completion, enhanced error handling', 'success');
+        log('🚀 Ready to test OAuth 2.0 Device Authorization Grant flow!', 'info');
+        log('Click "Start Authentication Flow" to begin testing!', 'info');
+    </script>
+</body>
+</html>
