@@ -529,6 +529,95 @@ If job is not complete:
         </div>
 
         <!-- ============================================================================ -->
+        <!-- DEBUG ENDPOINTS -->
+        <!-- ============================================================================ -->
+        
+        <h1 style="margin-top: 40px; color: #2c3e50; border-top: 3px solid #2c3e50; padding-top: 20px;">🐛 Debug Endpoints</h1>
+
+        <!-- POST /api/jobs/reprocess - Reprocess Last Job -->
+        <div class="endpoint-section" style="background-color: #fff3cd; border-color: #ffeaa7;">
+            <div class="endpoint-title">
+                <span class="endpoint-method method-post">POST</span>
+                <span>/api/jobs/reprocess</span>
+            </div>
+            <div class="endpoint-url">POST https://udev-backend.teeramusic.com:15351/api/jobs/reprocess</div>
+            <div class="description">
+                <strong>Reprocess the last job (DEBUG ONLY)</strong><br>
+                Reprocesses the most recent completed job with updated metadata. This endpoint is for debugging purposes only and should not be used in production.
+            </div>
+            
+            <div class="request-response">
+                <div class="request">
+                    <h4>Form Data</h4>
+                    <div class="json-block">data: JSON string (required)</div>
+                    <h4>Data Field JSON Structure</h4>
+                    <div class="json-block">{
+  "meta": {
+    "speaker_names": ["kii L", "Kii R", "Adam L", "Adam R", "Sub L", "Sub R"],
+    "is_subwoofer": [false, false, false, false, true, true],
+    "bitdepth": "int24",
+    "sampling_rate": 96000,
+    "sweep_params": {
+      "type": "type_1",
+      "version": "1.0.0",
+      "start_frequency": 20,
+      "end_frequency": 20000,
+      "start_silence": 100,
+      "stop_silence": 100,
+      "sweep_length": 1000
+    }
+  }
+}</div>
+                </div>
+                <div class="response">
+                    <h4>Response</h4>
+                    <div class="json-block">{
+  "message": "Job reprocessed successfully",
+  "job_id": "uuid-string",
+  "status": "queued",
+  "estimated_eta": "Processing will begin shortly"
+}</div>
+                </div>
+            </div>
+            
+            <div class="test-controls">
+                <div class="input-group">
+                    <label for="reprocessSpeakerNames">Speaker Names (JSON):</label>
+                    <textarea id="reprocessSpeakerNames">["kii L", "Kii R", "Adam L", "Adam R", "Sub L", "Sub R"]</textarea>
+                </div>
+                <div class="input-group">
+                    <label for="reprocessIsSubwoofer">Is Subwoofer (JSON):</label>
+                    <textarea id="reprocessIsSubwoofer">[false, false, false, false, true, true]</textarea>
+                </div>
+                <div class="input-group">
+                    <label for="reprocessBitdepth">Bit Depth:</label>
+                    <select id="reprocessBitdepth">
+                        <option value="int24">int24</option>
+                        <option value="float32">float32</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="reprocessSamplingRate">Sampling Rate:</label>
+                    <input type="number" id="reprocessSamplingRate" value="96000" />
+                </div>
+                <div class="input-group">
+                    <label for="reprocessSweepParams">Sweep Parameters (JSON):</label>
+                    <textarea id="reprocessSweepParams">{
+  "type": "type_1",
+  "version": "1.0.0",
+  "start_frequency": 20,
+  "end_frequency": 20000,
+  "start_silence": 100,
+  "stop_silence": 100,
+  "sweep_length": 1000
+}</textarea>
+                </div>
+                <button class="test-button" onclick="reprocessLastJob()">Reprocess Last Job</button>
+                <div id="reprocessLastJobResult" class="result" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- ============================================================================ -->
         <!-- EXISTING JOB MANAGEMENT ENDPOINTS -->
         <!-- ============================================================================ -->
         
@@ -1391,6 +1480,43 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
             } catch (error) {
                 console.error('Error checking job status:', error);
                 showResult('updateJobResult', error.message, true);
+            }
+        }
+
+        // ============================================================================
+        // DEBUG FUNCTIONS
+        // ============================================================================
+
+        async function reprocessLastJob() {
+            try {
+                const speakerNames = JSON.parse(document.getElementById('reprocessSpeakerNames').value);
+                const isSubwoofer = JSON.parse(document.getElementById('reprocessIsSubwoofer').value);
+                const bitdepth = document.getElementById('reprocessBitdepth').value;
+                const samplingRate = parseInt(document.getElementById('reprocessSamplingRate').value);
+                const sweepParams = JSON.parse(document.getElementById('reprocessSweepParams').value);
+                
+                const requestData = {
+                    meta: {
+                        speaker_names: speakerNames,
+                        is_subwoofer: isSubwoofer,
+                        bitdepth: bitdepth,
+                        sampling_rate: samplingRate,
+                        sweep_params: sweepParams
+                    }
+                };
+                
+                const formData = new FormData();
+                formData.append('data', JSON.stringify(requestData));
+
+                const data = await makeFormDataRequest(`${API_BASE}/api/jobs/reprocess`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                showResult('reprocessLastJobResult', data);
+                
+            } catch (error) {
+                showResult('reprocessLastJobResult', error.message, true);
             }
         }
 
