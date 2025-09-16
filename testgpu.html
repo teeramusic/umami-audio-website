@@ -182,6 +182,15 @@
     <div class="container">
         <h1>🔧 New Job Lifecycle API Test Interface</h1>
         
+        <!-- Database Schema Changes -->
+        <div class="auth-section" style="background-color: #fff3cd; border-color: #ffeaa7;">
+            <h3>📊 Database Schema Updates</h3>
+            <p><strong>Removed Columns:</strong> <code>input_file_path</code>, <code>output_file_path</code>, <code>parameters</code>, and <code>job_file_path</code></p>
+            <p><strong>File Paths:</strong> Now hardcoded as <code>user_uploads/{sanitized_email}/{job_id}/</code></p>
+            <p><strong>Parameters:</strong> Now stored in the <code>meta</code> JSON field</p>
+            <p><strong>Fresh Database:</strong> All migration history cleared and fresh database created</p>
+        </div>
+        
         <!-- Workflow Information -->
         <div class="auth-section" style="background-color: #e8f5e8; border-color: #4caf50;">
             <h3>🔄 New Job Lifecycle Workflow</h3>
@@ -190,6 +199,7 @@
             <p><strong>Step 3:</strong> Mark job ready with <code>POST /api/jobs/update</code> (task: ready, includes metadata)</p>
             <p><strong>Step 4:</strong> Monitor progress with <code>GET /api/jobs/{job_id}/status</code></p>
             <p><strong>Step 5:</strong> Download calibration file with <code>GET /api/jobs/{job_id}/calibration</code> when complete</p>
+            <p><strong>📁 File Paths:</strong> All file paths are now hardcoded as <code>user_uploads/{sanitized_email}/{job_id}/</code></p>
         </div>
         
         <!-- Authentication Section -->
@@ -549,10 +559,18 @@ limit: 100 (optional, default: 100)</div>
     "id": 123,
     "job_id": "uuid-string",
     "title": "My GPU Processing Job",
+    "description": "Process audio file for calibration",
     "status": "pending",
     "progress": 0.0,
+    "file_size": 1024000,
+    "meta": {
+      "speaker_names": ["kii L", "Kii R"],
+      "is_subwoofer": [false, false],
+      "bitdepth": "int24",
+      "sampling_rate": 96000
+    },
     "created_at": "2024-01-01T12:00:00Z",
-    ...
+    "expires_at": "2024-01-04T12:00:00Z"
   }
 ]</div>
                 </div>
@@ -599,8 +617,20 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
   "description": "Process audio file for calibration",
   "status": "completed",
   "progress": 100.0,
+  "file_size": 2048000,
+  "meta": {
+    "speaker_names": ["kii L", "Kii R", "Adam L", "Adam R"],
+    "is_subwoofer": [false, false, false, false],
+    "bitdepth": "int24",
+    "sampling_rate": 96000,
+    "sweep_params": {
+      "type": "type_1",
+      "start_frequency": 20,
+      "end_frequency": 20000
+    }
+  },
   "result": {
-    "output_file": "processed_audio.wav",
+    "calibration_file": "550e8400-e29b-41d4-a716-446655440000.npz",
     "processing_time": 45.2
   },
   "created_at": "2024-01-01T12:00:00Z",
