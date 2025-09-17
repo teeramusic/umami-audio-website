@@ -543,7 +543,7 @@ If job is not complete:
             <div class="endpoint-url">POST https://udev-backend.teeramusic.com:15351/api/jobs/reprocess</div>
             <div class="description">
                 <strong>Reprocess the last job (DEBUG ONLY)</strong><br>
-                Reprocesses the most recent completed job with updated metadata. This endpoint is for debugging purposes only and should not be used in production.
+                Reprocesses the most recent completed job with updated metadata using the same job ID. This endpoint is for debugging purposes only and should not be used in production.
             </div>
             
             <div class="request-response">
@@ -573,9 +573,10 @@ If job is not complete:
                     <h4>Response</h4>
                     <div class="json-block">{
   "message": "Job reprocessed successfully",
-  "job_id": "uuid-string",
+  "job_id": "same-job-id-as-original",
   "status": "queued",
-  "estimated_eta": "Processing will begin shortly"
+  "estimated_eta": "Processing will begin shortly",
+  "updated_metadata": { ... }
 }</div>
                 </div>
             </div>
