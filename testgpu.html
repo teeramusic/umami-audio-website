@@ -583,34 +583,22 @@ If job is not complete:
             
             <div class="test-controls">
                 <div class="input-group">
-                    <label for="reprocessSpeakerNames">Speaker Names (JSON):</label>
-                    <textarea id="reprocessSpeakerNames">["kii L", "Kii R", "Adam L", "Adam R", "Sub L", "Sub R"]</textarea>
-                </div>
-                <div class="input-group">
-                    <label for="reprocessIsSubwoofer">Is Subwoofer (JSON):</label>
-                    <textarea id="reprocessIsSubwoofer">[false, false, false, false, true, true]</textarea>
-                </div>
-                <div class="input-group">
-                    <label for="reprocessBitdepth">Bit Depth:</label>
-                    <select id="reprocessBitdepth">
-                        <option value="int24">int24</option>
-                        <option value="float32">float32</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="reprocessSamplingRate">Sampling Rate:</label>
-                    <input type="number" id="reprocessSamplingRate" value="96000" />
-                </div>
-                <div class="input-group">
-                    <label for="reprocessSweepParams">Sweep Parameters (JSON):</label>
-                    <textarea id="reprocessSweepParams">{
-  "type": "type_1",
-  "version": "1.0.0",
-  "start_frequency": 20,
-  "end_frequency": 20000,
-  "start_silence": 100,
-  "stop_silence": 100,
-  "sweep_length": 1000
+                    <label for="reprocessMeta">Meta JSON (Complete metadata object):</label>
+                    <textarea id="reprocessMeta" style="height: 200px;">{
+  "speaker_names": ["kii L", "Kii R", "Adam L", "Adam R", "Sub L", "Sub R"],
+  "real_calibrate": true,
+  "is_subwoofer": [false, false, false, false, true, true],
+  "bitdepth": "int24",
+  "sampling_rate": 96000,
+  "sweep_params": {
+    "type": "type_1",
+    "version": "1.0.0",
+    "start_frequency": 20,
+    "end_frequency": 20000,
+    "start_silence": 100,
+    "stop_silence": 100,
+    "sweep_length": 1000
+  }
 }</textarea>
                 </div>
                 <button class="test-button" onclick="reprocessLastJob()">Reprocess Last Job</button>
@@ -1490,20 +1478,11 @@ Example: "550e8400-e29b-41d4-a716-446655440000"</div>
 
         async function reprocessLastJob() {
             try {
-                const speakerNames = JSON.parse(document.getElementById('reprocessSpeakerNames').value);
-                const isSubwoofer = JSON.parse(document.getElementById('reprocessIsSubwoofer').value);
-                const bitdepth = document.getElementById('reprocessBitdepth').value;
-                const samplingRate = parseInt(document.getElementById('reprocessSamplingRate').value);
-                const sweepParams = JSON.parse(document.getElementById('reprocessSweepParams').value);
+                const metaJson = document.getElementById('reprocessMeta').value;
+                const meta = JSON.parse(metaJson);
                 
                 const requestData = {
-                    meta: {
-                        speaker_names: speakerNames,
-                        is_subwoofer: isSubwoofer,
-                        bitdepth: bitdepth,
-                        sampling_rate: samplingRate,
-                        sweep_params: sweepParams
-                    }
+                    meta: meta
                 };
                 
                 const formData = new FormData();
