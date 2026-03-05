@@ -279,7 +279,17 @@ file: [audio file] (required for upload/replace)</div>
   "is_subwoofer": [...],  // required for ready
   "bitdepth": "int24",  // required for ready
   "sampling_rate": 96000,  // required for ready
-  "sweep_params": {...}  // required for ready
+  "sweep_params": {
+    "type": "type_1",
+    "version": "1.0.0",
+    "start_frequency": 20,
+    "end_frequency": 20000,
+    "start_silence": 100,
+    "stop_silence": 100,
+    "sweep_length": 1000,
+    "use_sweep_file": true,
+    "sweep_file_name": "sss_96khz_1048576_sweep_96000_start_silence_199424_end_silence_f1_2_68885970115661621hz_f2_48000_00hz.wav"
+  }
 }</div>
                 </div>
                 <div class="response">
@@ -387,7 +397,9 @@ file: [audio file] (required for upload/replace)</div>
     "end_frequency": 20000,
     "start_silence": 100,
     "stop_silence": 100,
-    "sweep_length": 1000
+    "sweep_length": 1000,
+    "use_sweep_file": true,
+    "sweep_file_name": "sss_96khz_1048576_sweep_96000_start_silence_199424_end_silence_f1_2_68885970115661621hz_f2_48000_00hz.wav"
   }
 }</div>
                 </div>
@@ -435,7 +447,9 @@ file: [audio file] (required for upload/replace)</div>
   "end_frequency": 20000,
   "start_silence": 100,
   "stop_silence": 100,
-  "sweep_length": 1000
+  "sweep_length": 1000,
+  "use_sweep_file": true,
+  "sweep_file_name": "sss_96khz_1048576_sweep_96000_start_silence_199424_end_silence_f1_2_68885970115661621hz_f2_48000_00hz.wav"
 }</textarea>
                 </div>
                 <button class="test-button" onclick="markJobReady()">Mark Job Ready</button>
@@ -564,7 +578,9 @@ If job is not complete:
       "end_frequency": 20000,
       "start_silence": 100,
       "stop_silence": 100,
-      "sweep_length": 1000
+      "sweep_length": 1000,
+      "use_sweep_file": true,
+      "sweep_file_name": "sss_96khz_1048576_sweep_96000_start_silence_199424_end_silence_f1_2_68885970115661621hz_f2_48000_00hz.wav"
     }
   }
 }</div>
@@ -597,7 +613,9 @@ If job is not complete:
     "end_frequency": 20000,
     "start_silence": 100,
     "stop_silence": 100,
-    "sweep_length": 1000
+    "sweep_length": 1000,
+    "use_sweep_file": true,
+    "sweep_file_name": "sss_96khz_1048576_sweep_96000_start_silence_199424_end_silence_f1_2_68885970115661621hz_f2_48000_00hz.wav"
   }
 }</textarea>
                 </div>
