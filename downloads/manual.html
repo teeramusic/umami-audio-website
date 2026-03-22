@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perfect Soup User Manual — Umami Audio</title>
+<style>
+/* ===== Reset & Base ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --color-primary: #3B6FA0;
+  --color-accent: #9B6EC6;
+  --color-highlight: #A89060;
+  --color-bg: #1C1C1E;
+  --color-surface: #2C2C2E;
+  --color-surface-alt: #323234;
+  --color-text: #F5F5F7;
+  --color-text-secondary: #98989D;
+  --color-success: #30D158;
+  --color-warning: #FF9F0A;
+  --color-error: #FF453A;
+  --color-border: #38383A;
+  --color-border-subtle: #2E2E30;
+  --color-gradient-start: #1E2D42;
+  --color-gradient-end: #2D2240;
+  --sidebar-width: 280px;
+  --content-max: 820px;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 40px;
+  --spacing-3xl: 48px;
+  --radius-card: 12px;
+  --radius-btn: 8px;
+}
+
+html { font-size: 16px; scroll-behavior: smooth; scroll-padding-top: 32px; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== Layout ===== */
+.page-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ===== Sidebar / TOC ===== */
+.sidebar {
+  position: fixed;
+  top: 0; left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  padding: var(--spacing-lg) var(--spacing-md) var(--spacing-xl);
+  z-index: 100;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(152,152,157,0.25) transparent;
+}
+.sidebar::-webkit-scrollbar { width: 6px; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(152,152,157,0.25); border-radius: 3px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+
+.sidebar-brand {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-xs);
+}
+.sidebar-subtitle {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.toc-list { list-style: none; }
+.toc-list li { margin-bottom: 2px; }
+.toc-list a {
+  display: block;
+  padding: 6px var(--spacing-sm);
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+.toc-list a:hover { background: var(--color-surface-alt); color: var(--color-text); }
+.toc-list a.active { background: var(--color-primary); color: #fff; border-radius: 6px; }
+.toc-list .toc-h2 > a { font-weight: 600; color: var(--color-text); }
+.toc-list .toc-h3 { padding-left: var(--spacing-md); }
+.toc-list .toc-h3 > a { font-size: 0.75rem; }
+
+/* Mobile hamburger */
+.sidebar-toggle {
+  display: none;
+  position: fixed;
+  top: 12px; left: 12px;
+  z-index: 200;
+  width: 40px; height: 40px;
+  border-radius: var(--radius-btn);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 90;
+}
+
+/* ===== Main Content ===== */
+.main-content {
+  margin-left: var(--sidebar-width);
+  flex: 1;
+  min-width: 0;
+}
+.content-inner {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--spacing-2xl) var(--spacing-xl) 80px;
+}
+
+/* ===== Hero ===== */
+.hero {
+  background: linear-gradient(135deg, var(--color-gradient-start) 0%, var(--color-gradient-end) 100%);
+  border-radius: var(--radius-card);
+  padding: var(--spacing-3xl) var(--spacing-xl);
+  margin-bottom: var(--spacing-2xl);
+  text-align: center;
+}
+.hero h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+}
+.hero .tagline {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+}
+
+/* ===== Typography ===== */
+h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: var(--spacing-3xl);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--color-primary);
+  color: var(--color-text);
+}
+h3 {
+  font-size: 1.1875rem;
+  font-weight: 600;
+  margin-top: var(--spacing-xl);
+  margin-bottom: var(--spacing-sm);
+  color: var(--color-text);
+}
+h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-sm);
+  color: var(--color-accent);
+}
+
+p { margin-bottom: var(--spacing-md); }
+strong { font-weight: 600; }
+
+a { color: var(--color-primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+ul, ol { margin-bottom: var(--spacing-md); padding-left: var(--spacing-lg); }
+li { margin-bottom: var(--spacing-xs); }
+
+/* ===== Cards ===== */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+.card h3 { margin-top: 0; }
+
+/* ===== Info/Callout boxes ===== */
+.callout {
+  border-left: 4px solid var(--color-primary);
+  background: var(--color-surface);
+  border-radius: 0 var(--radius-btn) var(--radius-btn) 0;
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+.callout.callout-accent { border-left-color: var(--color-accent); }
+.callout.callout-success { border-left-color: var(--color-success); }
+.callout.callout-warning { border-left-color: var(--color-warning); }
+.callout p:last-child { margin-bottom: 0; }
+
+/* ===== Tables ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--spacing-lg);
+  font-size: 0.875rem;
+}
+th {
+  text-align: left;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--color-border);
+}
+td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+tr:nth-child(even) td { background: var(--color-surface-alt); }
+
+/* ===== Checklist ===== */
+.checklist { list-style: none; padding-left: 0; }
+.checklist li {
+  position: relative;
+  padding-left: 28px;
+  margin-bottom: var(--spacing-sm);
+}
+.checklist li::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 4px;
+  width: 16px; height: 16px;
+  border: 2px solid var(--color-border);
+  border-radius: 3px;
+}
+
+/* ===== Config Examples ===== */
+.config-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+.config-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: var(--spacing-md);
+}
+.config-card h4 { margin-top: 0; font-size: 0.9375rem; }
+.config-card ul { margin-bottom: 0; font-size: 0.8125rem; }
+
+/* ===== Correction Tags ===== */
+.tag-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+.tag {
+  display: inline-block;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+/* ===== Footer ===== */
+.manual-footer {
+  text-align: center;
+  padding: var(--spacing-xl) 0;
+  margin-top: var(--spacing-3xl);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+  .sidebar { transform: translateX(-100%); transition: transform 0.25s ease; }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-toggle { display: flex; }
+  .sidebar-overlay.open { display: block; }
+  .main-content { margin-left: 0; }
+  .content-inner { padding: var(--spacing-lg) var(--spacing-md) 60px; }
+  .hero { padding: var(--spacing-xl) var(--spacing-md); }
+  .hero h1 { font-size: 1.5rem; }
+  .config-grid { grid-template-columns: 1fr; }
+  h2 { font-size: 1.25rem; }
+}
+
+.save-pdf-btn {
+  display: block;
+  width: 100%;
+  margin: 16px 0;
+  padding: 10px 16px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+}
+.save-pdf-btn:hover {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+/* ===== Print ===== */
+@media print {
+  :root {
+    --color-bg: #fff;
+    --color-surface: #f8f8f8;
+    --color-surface-alt: #f2f2f2;
+    --color-text: #1D1D1F;
+    --color-text-secondary: #666;
+    --color-primary: #0071E3;
+    --color-accent: #5E5CE6;
+    --color-border: #ddd;
+    --color-border-subtle: #eee;
+  }
+  body { background: #fff; color: #1D1D1F; font-size: 11pt; }
+  .sidebar, .sidebar-toggle, .sidebar-overlay, .save-pdf-btn { display: none !important; }
+  .main-content { margin-left: 0; }
+  .content-inner { max-width: 100%; padding: 0; }
+  .hero { background: none; border: 1px solid #ddd; }
+  .card, .callout, .config-card { break-inside: avoid; }
+  h2 { break-after: avoid; }
+  a { color: var(--color-primary); }
+  a::after { content: " (" attr(href) ")"; font-size: 0.8em; color: #888; }
+  a[href^="#"]::after { content: ""; }
+}
+</style>
+</head>
+<body>
+
+<!-- Mobile hamburger -->
+<button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle table of contents">&#9776;</button>
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<!-- Sidebar TOC -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-brand">Perfect Soup</div>
+  <div class="sidebar-subtitle">User Manual &mdash; Umami Audio</div>
+  <button class="save-pdf-btn" onclick="window.print()" title="Save as PDF">&#128196; Save as PDF</button>
+  <ul class="toc-list">
+    <li class="toc-h2"><a href="#overview">Overview</a></li>
+    <li class="toc-h2"><a href="#how-it-works">How It Works</a></li>
+    <li class="toc-h2"><a href="#what-gets-corrected">What Gets Corrected</a></li>
+    <li class="toc-h2"><a href="#speaker-groups">What Are Speaker Groups?</a></li>
+    <li class="toc-h2"><a href="#configuration-examples">Configuration Examples</a></li>
+    <li class="toc-h2"><a href="#calibration-wizard">Calibration Wizard</a></li>
+    <li class="toc-h3"><a href="#sign-in">Sign In</a></li>
+    <li class="toc-h3"><a href="#two-workflows">Two Workflows</a></li>
+    <li class="toc-h3"><a href="#step-1-pre-flight-checklist">Step 1: Pre-flight Checklist</a></li>
+    <li class="toc-h3"><a href="#step-2-select-device">Step 2: Select Device</a></li>
+    <li class="toc-h3"><a href="#step-3-sample-rate-check">Step 3: Sample Rate Check</a></li>
+    <li class="toc-h3"><a href="#step-4-speaker-configuration">Step 4: Speaker Configuration</a></li>
+    <li class="toc-h3"><a href="#step-5-select-microphone-input">Step 5: Select Microphone Input</a></li>
+    <li class="toc-h3"><a href="#step-6-adjust-microphone-sensitivity">Step 6: Adjust Microphone Sensitivity</a></li>
+    <li class="toc-h3"><a href="#step-7-configure-speaker-groups">Step 7: Configure Speaker Groups</a></li>
+    <li class="toc-h3"><a href="#step-8-microphone-placement">Step 8: Microphone Placement</a></li>
+    <li class="toc-h3"><a href="#step-9-measurement">Step 9: Measurement</a></li>
+    <li class="toc-h3"><a href="#step-10-upload-results">Step 10: Upload Results</a></li>
+    <li class="toc-h3"><a href="#step-11-complete">Step 11: Complete</a></li>
+    <li class="toc-h3"><a href="#create-from-existing-flow">Create from Existing Flow</a></li>
+    <li class="toc-h2"><a href="#calibration-loader-plugin">Calibration Loader Plugin</a></li>
+    <li class="toc-h3"><a href="#plugin-formats">Plugin Formats</a></li>
+    <li class="toc-h3"><a href="#plugin-interface">Plugin Interface</a></li>
+    <li class="toc-h3"><a href="#usage">Usage</a></li>
+    <li class="toc-h2"><a href="#licensing">Licensing</a></li>
+    <li class="toc-h3"><a href="#license-categories">License Categories</a></li>
+    <li class="toc-h3"><a href="#license-tiers">License Tiers</a></li>
+    <li class="toc-h3"><a href="#extra-supports">Extra Supports</a></li>
+    <li class="toc-h3"><a href="#calibration-extension">Calibration Extension</a></li>
+    <li class="toc-h3"><a href="#subscription-activation">Subscription Activation</a></li>
+    <li class="toc-h3"><a href="#upgrades">Upgrades</a></li>
+    <li class="toc-h3"><a href="#license-transfers">License Transfers</a></li>
+    <li class="toc-h3"><a href="#vst-plugin-activation">VST Plugin Activation</a></li>
+    <li class="toc-h3"><a href="#refund-policy">Refund Policy</a></li>
+    <li class="toc-h2"><a href="#workflow-summary">Workflow Summary</a></li>
+    <li class="toc-h2"><a href="#system-requirements">System Requirements</a></li>
+    <li class="toc-h2"><a href="#troubleshooting">Troubleshooting &amp; Support</a></li>
+  </ul>
+</nav>
+
+<!-- Main content -->
+<div class="page-wrapper">
+  <main class="main-content">
+    <div class="content-inner">
+
+      <div class="hero">
+        <h1>Perfect Soup User Manual</h1>
+        <p class="tagline"><strong>Umami Audio</strong> &mdash; Professional room correction and speaker calibration for your studio.</p>
+      </div>
+
+      <p>Perfect Soup consists of two components: <strong>Calibration Wizard</strong> (the standalone measurement app) and <strong>Calibration Loader</strong> (the DAW plugins that apply calibration). This manual covers both.</p>
+
+      <!-- ========== OVERVIEW ========== -->
+      <h2 id="overview">Overview</h2>
+      <p>Perfect Soup measures your room and speakers, then generates a calibration profile (<code>.soup-recipe</code> file) that corrects for room acoustics and speaker response. You use the plugin in your DAW to apply that correction during playback.</p>
+
+      <div class="callout">
+        <p><strong>Typical workflow:</strong></p>
+        <ol>
+          <li>Run Calibration Wizard</li>
+          <li>Sign in with your Umami Audio account</li>
+          <li>Measure your room (microphone + speakers)</li>
+          <li>Upload results for cloud processing</li>
+          <li>The generated <code>.soup-recipe</code> calibration is automatically synced to the Calibration Loader plugin</li>
+        </ol>
+      </div>
+
+      <!-- ========== HOW IT WORKS ========== -->
+      <h2 id="how-it-works">How It Works</h2>
+
+      <p>Perfect Soup uses a <strong>MIMO (Multiple-Input Multiple-Output) optimization</strong> approach to room correction. Unlike traditional per-speaker EQ correction, MIMO optimization treats your entire speaker system as a single cohesive acoustical system and solves for the best combined result.</p>
+
+      <div class="card">
+        <h3>The Optimization Process</h3>
+        <ol>
+          <li><strong>Measurement capture</strong> &mdash; The Calibration Wizard plays a series of sweep signals through each speaker and records the room response at multiple microphone positions. This captures how every speaker interacts with the room and with each other speaker.</li>
+          <li><strong>Cloud processing</strong> &mdash; Your measurement data is uploaded to the Umami Audio cloud, where GPU-accelerated optimization runs across all captured impulse responses simultaneously.</li>
+          <li><strong>Iterative MIMO optimization</strong> &mdash; The algorithm iterates through thousands of filter variations, evaluating how every speaker correction affects the overall system response at every measurement position. It minimizes the total error across all speakers and all positions together, rather than correcting each speaker in isolation.</li>
+          <li><strong>Calibration delivery</strong> &mdash; The result is a single <code>.soup-recipe</code> file containing optimized FIR filters for every output channel, ready to load in the Calibration Loader plugin.</li>
+        </ol>
+      </div>
+
+      <div class="callout callout-accent">
+        <p><strong>Why MIMO matters:</strong> Conventional per-speaker correction can improve individual frequency responses but often makes cross-speaker coherence worse (e.g., phantom center imaging, crossover alignment between mains and subwoofers). MIMO optimization ensures that corrections to one speaker never degrade the combined performance of the system as a whole.</p>
+      </div>
+
+      <!-- ========== WHAT GETS CORRECTED ========== -->
+      <h2 id="what-gets-corrected">What Gets Corrected</h2>
+      <p>Perfect Soup addresses a comprehensive set of acoustic problems in your monitoring environment:</p>
+
+      <div class="tag-grid">
+        <span class="tag">Room modes</span>
+        <span class="tag">Speaker frequency response</span>
+        <span class="tag">Crossover alignment</span>
+        <span class="tag">Early reflections</span>
+        <span class="tag">Speaker-to-listener timing</span>
+        <span class="tag">MIMO cross-speaker coherence</span>
+      </div>
+
+      <ul>
+        <li><strong>Room modes</strong> &mdash; Standing waves that cause bass buildup or cancellation at certain frequencies and positions.</li>
+        <li><strong>Speaker frequency response</strong> &mdash; Deviations from a flat target across the audible range of each speaker.</li>
+        <li><strong>Crossover alignment</strong> &mdash; Phase and level matching at the crossover frequency between mains and subwoofers (or between any speakers sharing frequency ranges within a group).</li>
+        <li><strong>Early reflections</strong> &mdash; Short-delay reflections from walls, desk, and console surfaces that color the direct sound.</li>
+        <li><strong>Speaker-to-listener timing</strong> &mdash; Arrival-time differences between speakers at the listening position, corrected via delay alignment.</li>
+        <li><strong>MIMO cross-speaker coherence</strong> &mdash; The combined radiation pattern and interaction of all speakers, optimized as a single system so that corrections to one speaker do not degrade the response of the system as a whole.</li>
+      </ul>
+
+      <!-- ========== WHAT ARE SPEAKER GROUPS? ========== -->
+      <h2 id="speaker-groups">What Are Speaker Groups?</h2>
+
+      <p>A <strong>speaker group</strong> is a logical grouping of one or more speakers that together reproduce a single audio channel. Each group corresponds to one input channel in the Calibration Loader plugin.</p>
+
+      <div class="card">
+        <h3>Primary vs. Support Speakers</h3>
+        <p>Each group has one or more <strong>primary speakers</strong> (the main drivers that reproduce the channel) and optionally one or more <strong>support speakers</strong> (typically subwoofers that handle low-frequency content for that channel).</p>
+        <p>For example, a typical stereo group "L" would have the left speaker as its primary and a subwoofer as a support speaker. The optimization considers both together when generating the correction filter for the "L" channel.</p>
+      </div>
+
+      <div class="card">
+        <h3>Group Types</h3>
+        <ul>
+          <li><strong>Normal group</strong> &mdash; Represents a standard audio channel (L, R, C, etc.) with at least one primary speaker.</li>
+          <li><strong>Phantom group</strong> &mdash; A virtual channel reproduced by two primary speakers (e.g., phantom center from L+R). Requires exactly two primary speakers.</li>
+          <li><strong>LFE group</strong> &mdash; A dedicated Low Frequency Effects channel. Must have at least one speaker assigned (typically a subwoofer).</li>
+        </ul>
+      </div>
+
+      <p>The number of speaker groups you can create depends on your license tier. Support speakers per group are also tier-dependent (see <a href="#licensing">Licensing</a>).</p>
+
+      <!-- ========== CONFIGURATION EXAMPLES ========== -->
+      <h2 id="configuration-examples">Configuration Examples</h2>
+      <p>Below are common speaker configurations and how they map to speaker groups in Perfect Soup.</p>
+
+      <div class="config-grid">
+        <div class="config-card">
+          <h4>2.1 Stereo + Sub</h4>
+          <ul>
+            <li>Group 1: L (primary) + Sub (support)</li>
+            <li>Group 2: R (primary) + Sub (support)</li>
+          </ul>
+          <p style="font-size:0.75rem;color:var(--color-text-secondary);margin-top:8px;">2 groups, 1 support per group</p>
+        </div>
+
+        <div class="config-card">
+          <h4>2.2 Stereo + 2 Subs</h4>
+          <ul>
+            <li>Group 1: L (primary) + Sub L, Sub R (supports)</li>
+            <li>Group 2: R (primary) + Sub L, Sub R (supports)</li>
+          </ul>
+          <p style="font-size:0.75rem;color:var(--color-text-secondary);margin-top:8px;">2 groups, 2 supports per group</p>
+        </div>
+
+        <div class="config-card">
+          <h4>5.1 Surround</h4>
+          <ul>
+            <li>Group 1: L + Sub</li>
+            <li>Group 2: R + Sub</li>
+            <li>Group 3: C + Sub</li>
+            <li>Group 4: Ls + Sub</li>
+            <li>Group 5: Rs + Sub</li>
+            <li>Group 6: LFE (Sub)</li>
+          </ul>
+          <p style="font-size:0.75rem;color:var(--color-text-secondary);margin-top:8px;">6 groups, 1 support each</p>
+        </div>
+
+        <div class="config-card">
+          <h4>5.1 Cross-Support</h4>
+          <ul>
+            <li>Group 1: L + Sub1, Sub2</li>
+            <li>Group 2: R + Sub1, Sub2</li>
+            <li>Group 3: C + Sub1, Sub2</li>
+            <li>Group 4: Ls + Sub1, Sub2</li>
+            <li>Group 5: Rs + Sub1, Sub2</li>
+            <li>Group 6: LFE (Sub1, Sub2)</li>
+          </ul>
+          <p style="font-size:0.75rem;color:var(--color-text-secondary);margin-top:8px;">6 groups, 2 supports each</p>
+        </div>
+
+        <div class="config-card">
+          <h4>7.1.4 Atmos</h4>
+          <ul>
+            <li>Groups 1&ndash;7: L, R, C, Ls, Rs, Lrs, Rrs (each + Sub)</li>
+            <li>Group 8: LFE (Sub)</li>
+            <li>Groups 9&ndash;12: Ltf, Rtf, Ltr, Rtr (height speakers)</li>
+          </ul>
+          <p style="font-size:0.75rem;color:var(--color-text-secondary);margin-top:8px;">12 groups &mdash; requires The Perfect Soup tier</p>
+        </div>
+      </div>
+
+      <!-- ========== CALIBRATION WIZARD ========== -->
+      <h2 id="calibration-wizard">Calibration Wizard</h2>
+      <p>The Calibration Wizard is a standalone application that guides you through measurement setup and execution.</p>
+
+      <h3 id="sign-in">Sign In</h3>
+      <ol>
+        <li>Launch the wizard</li>
+        <li>Click <strong>Login</strong></li>
+        <li>Use <strong>Device Flow</strong> authentication:
+          <ul>
+            <li>A browser window opens with a verification URL and code</li>
+            <li>Enter the code on the website if prompted</li>
+            <li>Authorize the wizard</li>
+            <li>The wizard detects when you are signed in and continues</li>
+          </ul>
+        </li>
+      </ol>
+
+      <h3 id="two-workflows">Two Workflows</h3>
+      <p>After signing in, you can choose:</p>
+      <ul>
+        <li><strong>Measure &amp; Create a New Calibration</strong> &mdash; Full measurement flow with microphone and speakers</li>
+        <li><strong>Create from Existing Measurement</strong> &mdash; Create a new calibration from a previously saved measurement</li>
+      </ul>
+
+      <h3 id="measure-create-flow" style="margin-top:var(--spacing-xl);">Measure &amp; Create Flow</h3>
+
+      <h4 id="step-1-pre-flight-checklist">Step 1: Pre-flight Checklist</h4>
+      <p>Before starting, verify:</p>
+      <ul class="checklist">
+        <li>Calibration microphone connected and powered on</li>
+        <li>Microphone audio not routed to speaker output (no feedback loop)</li>
+        <li>All other audio applications are closed (DAWs, browsers, system sounds) &mdash; other apps can lock the audio device and prevent sample rate changes. Turn off system notifications to avoid interrupting measurements.</li>
+        <li>Inputs and outputs on the same audio device</li>
+      </ul>
+
+      <h4 id="step-2-select-device">Step 2: Select Device</h4>
+      <ul>
+        <li>Choose the audio interface you want to calibrate</li>
+        <li>Use <strong>Refresh</strong> to update the device list</li>
+      </ul>
+
+      <h4 id="step-3-sample-rate-check">Step 3: Sample Rate Check</h4>
+      <ul>
+        <li>Umami Audio requires <strong>96 kHz</strong> sample rate for best results</li>
+        <li>The wizard shows the current sample rate</li>
+        <li>If not 96 kHz, change it in the device's manufacturer control panel</li>
+        <li>Use <strong>Open Control Panel</strong> to open the device settings</li>
+      </ul>
+
+      <h4 id="step-4-speaker-configuration">Step 4: Speaker Configuration</h4>
+      <p>Configure each output channel:</p>
+      <ul>
+        <li><strong>Speaker Name</strong> &mdash; Name each channel (e.g. L, R, C)</li>
+        <li><strong>Speaker Type</strong> &mdash; Speaker, Height (elevation channels, e.g. the .4 in 7.1.4), or Subwoofer</li>
+        <li><strong>Model</strong> &mdash; Optional model identifier</li>
+        <li><strong>Enable</strong> &mdash; Enable/disable channels for calibration</li>
+        <li><strong>Identify</strong> &mdash; Play a test tone to identify which channel is which</li>
+      </ul>
+      <ul>
+        <li><strong>Headroom</strong> &mdash; Controls how quietly the calibration sweep plays relative to your system's full output. Press <strong>Identify</strong> on any speaker to preview the level. After calibration, your system will be capable of playing roughly that many dB louder than what you hear during the sweep. Options: 20, 25, 30, 35, or 40 dB. If unsure, the default of 30 dB is a safe starting point for most systems.</li>
+        <li><strong>Select All</strong> / <strong>Select None</strong> &mdash; Quick toggle for all channels</li>
+      </ul>
+
+      <h4 id="step-5-select-microphone-input">Step 5: Select Microphone Input</h4>
+      <ul>
+        <li>Select the input channel for your calibration microphone</li>
+        <li>An input level meter shows signal</li>
+        <li>Clap near the microphone to verify the selected input</li>
+      </ul>
+
+      <h4 id="step-6-adjust-microphone-sensitivity">Step 6: Adjust Microphone Sensitivity</h4>
+      <ul>
+        <li>Place the microphone at the listening position</li>
+        <li>Press <strong>Test</strong> to play a test tone</li>
+        <li>Adjust your preamp gain until the level is in the green zone</li>
+      </ul>
+      <p><strong>Microphone Calibration Files</strong> &mdash; Two slots are available:</p>
+      <ul>
+        <li><strong>0&deg; (on-axis)</strong> &mdash; Used for height speakers and for stereo/mono setups. If this is the only file provided, it is used for all measurements.</li>
+        <li><strong>90&deg; calibration file</strong> &mdash; Used for ear-level speakers in surround setups. Required when pointing the mic at the ceiling for surround measurement.</li>
+      </ul>
+
+      <h4 id="step-7-configure-speaker-groups">Step 7: Configure Speaker Groups</h4>
+      <p>Organize your outputs into speaker groups. Each group number corresponds to an input channel in the Calibration Loader.</p>
+      <ul>
+        <li><strong>Channel Order</strong> &mdash; Film/Pro Tools, SMPTE/ITU, or DTS</li>
+        <li><strong>Use Defaults</strong> &mdash; Apply a preset group layout (all subwoofers are assigned as support speakers for every group by default)</li>
+        <li><strong>Create Group</strong> &mdash; Create a custom group</li>
+        <li><strong>Create LFE Channel</strong> &mdash; Add an LFE channel group</li>
+        <li><strong>Clear All</strong> &mdash; Remove all groups</li>
+        <li><strong>Drag to reorder</strong> &mdash; Drag groups up or down to change their order. The group order corresponds to the plugin input channel inside your DAW (group 1 = input channel 1, group 2 = input channel 2, etc.).</li>
+        <li><strong>Click group number</strong> &mdash; Click a group's number to type a new channel. If that channel is already assigned, the two groups swap positions.</li>
+        <li><strong>Primary speaker swap</strong> &mdash; Clicking a primary speaker that is already assigned to another group swaps the two assignments automatically.</li>
+      </ul>
+
+      <div class="callout callout-warning">
+        <p><strong>Validation requirements before proceeding:</strong></p>
+        <ul>
+          <li>Normal groups must have at least one primary speaker assigned</li>
+          <li>Phantom groups must have two primary speakers assigned</li>
+          <li>LFE groups must have at least one speaker assigned (a warning appears if none are subwoofers)</li>
+        </ul>
+      </div>
+
+      <h4 id="step-8-microphone-placement">Step 8: Microphone Placement</h4>
+      <p>The wizard includes a 10-slide illustrated guide. Key points:</p>
+      <ol>
+        <li><strong>Start at the center</strong> &mdash; Place the mic at the exact center of your main listening position (where your head normally sits). This is the most important measurement point.</li>
+        <li><strong>Expand symmetrically</strong> &mdash; Move the mic left, right, forward, backward, and diagonally. Space positions roughly 5&ndash;15 cm apart. The averaged center of all positions becomes your acoustic focal point.</li>
+        <li><strong>30&ndash;100 positions</strong> &mdash; You need at least 30 measurement positions. You can do up to 100 for greater accuracy.</li>
+        <li><strong>Cover your listening area</strong> &mdash; Spread positions across everywhere you (or listeners) might sit or move, plus a little further out.</li>
+        <li><strong>Vary the height</strong> &mdash; Include measurements at multiple heights to account for posture changes and listeners of different stature.</li>
+        <li><strong>Client positions (optional)</strong> &mdash; Record all main listener positions first. Then switch the toggle on the measurement page to "Client Position" and measure secondary seating. Once switched, you cannot go back. Client positions do not influence the acoustic center calculation.</li>
+        <li><strong>Mic stand setup</strong> &mdash; Always use a mic stand. Slide the mic as far up the clip as possible so the diaphragm is as far from the clip and stand as you can get it.</li>
+        <li><strong>Mic orientation</strong> &mdash; For stereo or mono, point the mic towards the phantom center between your speakers (use the 0&deg; calibration file). For surround, point the mic straight up at the ceiling (use the 90&deg; calibration file).</li>
+        <li><strong>Stay clear during measurement</strong> &mdash; After pressing Record, the pre-sweep delay gives you time to move out of the speaker-to-mic path. Sit somewhere off to the side and stay quiet.</li>
+        <li><strong>Noise = abort and redo</strong> &mdash; If noise occurs during a sweep, press Abort Sweep. Interrupted sweeps are automatically discarded. Then record that position again.</li>
+      </ol>
+
+      <h4 id="step-9-measurement">Step 9: Measurement</h4>
+      <ul>
+        <li><strong>Position type toggle</strong> &mdash; Set to Main Listener (default) or Client Position. Record all main positions first.</li>
+        <li><strong>Pre-sweep delay</strong> &mdash; Adjustable (default 7 seconds). Time before the sweep starts so you can move away.</li>
+        <li><strong>Record Position</strong> &mdash; Starts a measurement sweep for the current mic position.</li>
+        <li><strong>Abort Sweep</strong> &mdash; Cancels the current sweep. The interrupted data is discarded automatically.</li>
+        <li><strong>Position log</strong> &mdash; Shows each recorded position and whether it was a main or client measurement.</li>
+        <li>Keep the room quiet during sweeps.</li>
+      </ul>
+
+      <h4 id="step-10-upload-results">Step 10: Upload Results</h4>
+      <ul>
+        <li>Give the measurement a name (e.g. "Studio A &mdash; March 2026")</li>
+        <li>Upload progress is shown</li>
+        <li>Data is sent to the Umami Audio cloud for processing</li>
+      </ul>
+
+      <h4 id="step-11-complete">Step 11: Complete</h4>
+      <p>When complete, the calibration is ready.</p>
+
+      <h3 id="create-from-existing-flow">Create from Existing Flow</h3>
+      <ul>
+        <li>Select a previous measurement from the list</li>
+        <li>Create a new calibration profile from that measurement</li>
+      </ul>
+
+      <!-- ========== CALIBRATION LOADER PLUGIN ========== -->
+      <h2 id="calibration-loader-plugin">Calibration Loader Plugin</h2>
+      <p>The Calibration Loader plugin applies room correction in your DAW. Calibration profiles are automatically synced from the cloud after processing completes.</p>
+
+      <h3 id="plugin-formats">Plugin Formats</h3>
+      <ul>
+        <li><strong>VST3</strong> &mdash; Most DAWs (Ableton, Cubase, Logic, etc.)</li>
+        <li><strong>AU</strong> &mdash; Logic Pro, GarageBand, and other AU hosts (macOS)</li>
+        <li><strong>AAX</strong> &mdash; Pro Tools</li>
+      </ul>
+
+      <h3 id="plugin-interface">Plugin Interface</h3>
+
+      <h4>Configuration</h4>
+      <ul>
+        <li><strong>Calibration selector</strong> &mdash; Choose from your available calibration profiles (automatically synced from the cloud)</li>
+        <li><strong>No configuration loaded</strong> / filename &mdash; Shows the currently active calibration</li>
+      </ul>
+
+      <h4>Volume</h4>
+      <ul>
+        <li><strong>Volume slider</strong> &mdash; Master output level (0.0 to 2.0, where 1.0 is unity)</li>
+        <li><strong>Display</strong> &mdash; Shows level in dB</li>
+      </ul>
+
+      <h4>Bypass</h4>
+      <ul>
+        <li><strong>Bypass</strong> &mdash; Disable processing (pass-through)</li>
+      </ul>
+
+      <h3 id="usage">Usage</h3>
+      <ol>
+        <li>Insert the plugin on your <strong>monitor bus</strong> or output</li>
+        <li>Sign in with your Umami Audio account</li>
+        <li>Select your calibration profile (automatically available after cloud processing)</li>
+        <li>Adjust volume if needed</li>
+        <li>Use Bypass to compare with/without calibration</li>
+      </ol>
+
+      <!-- ========== LICENSING ========== -->
+      <h2 id="licensing">Licensing</h2>
+      <p>Perfect Soup requires an Umami Audio account and a valid license. The software is free to download; a license is required for full use.</p>
+
+      <h3 id="license-categories">License Categories</h3>
+      <p>A Perfect Soup license grants use of the Calibration Loader plugin <strong>and</strong> the ability to create calibration profiles.</p>
+      <ul>
+        <li>Can be <strong>perpetual</strong> (one-time purchase) or <strong>subscription</strong> (monthly or yearly).</li>
+        <li>Install on as many computers as you like; only <strong>one computer</strong> may actively use the plugin at a time.</li>
+        <li><strong>Perpetual licenses</strong> include <strong>1 year of calibration access</strong>, activated on first use. After that, calibration access can be extended via the Calibration Extension add-on.</li>
+        <li><strong>Subscription licenses</strong> include calibration access for the duration of the subscription.</li>
+        <li>When calibration access expires, existing calibrations remain usable; you just cannot create new ones.</li>
+      </ul>
+
+      <h3 id="license-tiers">License Tiers</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Tier</th>
+            <th>Perpetual</th>
+            <th>Monthly</th>
+            <th>Yearly</th>
+            <th>Speaker Groups</th>
+            <th>Supports / Group</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Project Studio</strong></td>
+            <td>$199</td>
+            <td>$19 / mo</td>
+            <td>$190 / yr</td>
+            <td>Up to 2</td>
+            <td>1 (base)</td>
+          </tr>
+          <tr>
+            <td><strong>Platinum Studio</strong></td>
+            <td>$599</td>
+            <td>$49 / mo</td>
+            <td>$490 / yr</td>
+            <td>Up to 6</td>
+            <td>4 (base)</td>
+          </tr>
+          <tr>
+            <td><strong>The Perfect Soup</strong></td>
+            <td>$999</td>
+            <td>$79 / mo</td>
+            <td>$790 / yr</td>
+            <td>Unlimited</td>
+            <td>Unlimited</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Yearly subscriptions are billed annually at a discount (equivalent to 2 months free).</p>
+
+      <h3 id="extra-supports">Extra Supports</h3>
+      <p>If you need more supporting speakers per group, you can purchase <strong>Extra Supports</strong> &mdash; each adds +1 support per group:</p>
+      <ul>
+        <li>Perpetual: <strong>$59</strong> (one-time)</li>
+        <li>Subscription: <strong>$5 / month</strong> or <strong>$50 / year</strong></li>
+      </ul>
+      <p>Extra Supports are available for Project Studio and Platinum Studio tiers. The Perfect Soup tier has unlimited supports.</p>
+
+      <h3 id="calibration-extension">Calibration Extension</h3>
+      <p>For perpetual license holders whose included calibration access has expired, the Calibration Extension allows you to renew:</p>
+      <ul>
+        <li><strong>30 days:</strong> $19</li>
+        <li><strong>365 days:</strong> $69</li>
+      </ul>
+
+      <h3 id="subscription-activation">Subscription Activation</h3>
+      <p>All subscription periods (including bundled calibration from perpetual purchases) do <strong>not begin counting down until first use</strong>. First use is defined as the first time the VST plugin is activated on a computer, or the first time a calibration job is submitted.</p>
+
+      <h3 id="upgrades">Upgrades</h3>
+      <p>Perpetual licenses can be upgraded to a higher tier:</p>
+      <table>
+        <thead>
+          <tr><th>From</th><th>To</th><th>Upgrade Price</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Project Studio</td><td>Platinum Studio</td><td>$449</td></tr>
+          <tr><td>Platinum Studio</td><td>The Perfect Soup</td><td>$469</td></tr>
+          <tr><td>Project Studio</td><td>The Perfect Soup</td><td>$899</td></tr>
+        </tbody>
+      </table>
+      <p>Upgrades are processed through the Umami Audio website dashboard.</p>
+
+      <h3 id="license-transfers">License Transfers</h3>
+      <p>Perpetual licenses can be transferred to another Umami Audio account for a <strong>$20 fee</strong>. The transfer deactivates the license on all of the original owner's computers.</p>
+
+      <h3 id="vst-plugin-activation">VST Plugin Activation</h3>
+      <ul>
+        <li>The Calibration Loader plugin requires you to <strong>sign in</strong> with your Umami Audio account.</li>
+        <li>On sign-in, if you have exactly one license, it is automatically assigned.</li>
+        <li>If you have multiple licenses, select which one to use from the plugin's settings.</li>
+        <li>The plugin sends periodic license checks to confirm validity and that the license is not in use on another computer simultaneously.</li>
+        <li>If your computer goes offline, a <strong>7-day grace period</strong> allows continued use before the license is marked expired.</li>
+        <li>If the plugin detects an expired, exceeded, or conflicting license, audio is <strong>muted for 5 seconds every 60 seconds</strong> as a reminder. Bypassed and no-calibration states pass audio through unaffected.</li>
+      </ul>
+
+      <h3 id="refund-policy">Refund Policy</h3>
+      <p>All sales are final. No refunds are offered at this time.</p>
+
+      <!-- ========== WORKFLOW SUMMARY ========== -->
+      <h2 id="workflow-summary">Workflow Summary</h2>
+      <table>
+        <thead>
+          <tr><th>Step</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Install Perfect Soup (installer includes Wizard + plugins)</td></tr>
+          <tr><td>2</td><td>Create an Umami Audio account</td></tr>
+          <tr><td>3</td><td>Run Calibration Wizard and sign in</td></tr>
+          <tr><td>4</td><td>Complete the measurement flow</td></tr>
+          <tr><td>5</td><td>The calibration is automatically synced to the Calibration Loader plugin in your DAW</td></tr>
+        </tbody>
+      </table>
+
+      <!-- ========== SYSTEM REQUIREMENTS ========== -->
+      <h2 id="system-requirements">System Requirements</h2>
+
+      <h3>Minimum</h3>
+      <ul>
+        <li><strong>Windows:</strong> Windows 10 (64-bit) or later, ASIO compatible audio device</li>
+        <li><strong>macOS:</strong> macOS 11.0 Big Sur or later (Intel or Apple Silicon), Core Audio compatible audio device</li>
+        <li>4 GB RAM</li>
+        <li>500 MB free disk space</li>
+        <li>Internet connection (for cloud calibration processing)</li>
+      </ul>
+
+      <h3>Recommended</h3>
+      <ul>
+        <li>8 GB RAM or more</li>
+        <li>1 GB free disk space</li>
+        <li>Audio interface with measurement microphone</li>
+        <li>High-speed internet for faster job processing</li>
+      </ul>
+
+      <h3>Wizard Requirements</h3>
+      <ul>
+        <li>Windows: WebView2 Runtime (installed automatically if missing)</li>
+        <li>Calibration microphone</li>
+        <li>Audio interface with inputs and outputs on the same device</li>
+      </ul>
+
+      <!-- ========== TROUBLESHOOTING ========== -->
+      <h2 id="troubleshooting">Troubleshooting &amp; Support</h2>
+      <div class="callout">
+        <strong>Can&rsquo;t change the sample rate?</strong> Close all other applications that may be using the audio device (DAWs, browsers, media players, system sounds). On Windows, ASIO devices can only be controlled by one application at a time. If another program has the device open, the sample rate will be locked and cannot be changed.
+      </div>
+      <p style="margin-top:var(--spacing-lg);">For all other issues, contact us at <a href="mailto:support@umamiaudio.com">support@umamiaudio.com</a>.</p>
+
+      <div class="manual-footer">
+        &copy; 2026 Umami Audio. All rights reserved.
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.querySelector('.sidebar-overlay').classList.toggle('open');
+}
+// Close sidebar on link click (mobile)
+document.querySelectorAll('.sidebar a').forEach(function(a) {
+  a.addEventListener('click', function() {
+    if (window.innerWidth <= 900) {
+      document.getElementById('sidebar').classList.remove('open');
+      document.querySelector('.sidebar-overlay').classList.remove('open');
+    }
+  });
+});
+
+// Scroll-spy: highlight active TOC link based on scroll position
+(function() {
+  var tocLinks = document.querySelectorAll('.toc-list a[href^="#"]');
+  var sections = [];
+  tocLinks.forEach(function(link) {
+    var id = link.getAttribute('href').slice(1);
+    var el = document.getElementById(id);
+    if (el) sections.push({ el: el, link: link });
+  });
+
+  function updateActive() {
+    var scrollY = window.scrollY || document.documentElement.scrollTop;
+    var active = null;
+    for (var i = 0; i < sections.length; i++) {
+      var top = sections[i].el.getBoundingClientRect().top + scrollY - 100;
+      if (scrollY >= top) active = sections[i];
+    }
+    tocLinks.forEach(function(l) { l.classList.remove('active'); });
+    if (active) active.link.classList.add('active');
+  }
+
+  window.addEventListener('scroll', updateActive, { passive: true });
+  updateActive();
+})();
+</script>
+</body>
+</html>
