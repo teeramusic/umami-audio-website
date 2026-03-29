@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Umami Audio - Perfect Soup</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script type="text/javascript">
+      // Per-page social preview meta tags for GitHub Pages SPA
+      var pageMeta = {
+        '/': {
+          title: 'Umami Audio - Perfect Soup MIMO Speaker Calibration',
+          description: 'Professional MIMO speaker and room calibration software. Measure, correct, and perfect your listening environment with GPU-accelerated optimization.',
+        },
+        '/how-it-works': {
+          title: 'How It Works - Umami Audio',
+          description: 'Learn how Perfect Soup uses MIMO optimization to calibrate your speakers and room. Before and after measurements, speaker groups, and multi-seat setups explained.',
+        },
+        '/purchase': {
+          title: 'Purchase - Umami Audio',
+          description: 'Choose your Perfect Soup license tier. Project Studio, Platinum Studio, or The Perfect Soup — perpetual or subscription options for every studio.',
+        },
+        '/download': {
+          title: 'Download - Umami Audio',
+          description: 'Download Perfect Soup Calibration Wizard and Calibration Loader plugins for Windows and macOS. VST3, AU, and AAX formats.',
+        },
+        '/faq': {
+          title: 'FAQ - Umami Audio',
+          description: 'Frequently asked questions about Perfect Soup speaker calibration. Licensing, system requirements, measurement tips, and more.',
+        },
+        '/tos': {
+          title: 'Terms of Service - Umami Audio',
+          description: 'Umami Audio Terms of Service for Perfect Soup speaker calibration software.',
+        },
+        '/privacy': {
+          title: 'Privacy Policy - Umami Audio',
+          description: 'Umami Audio Privacy Policy. How we handle your data and protect your privacy.',
+        },
+      };
+
+      var path = window.location.pathname.replace(/\/+$/, '') || '/';
+      var meta = pageMeta[path] || pageMeta['/'];
+
+      document.title = meta.title;
+
+      // Inject OG and Twitter meta tags
+      var tags = [
+        ['property', 'og:title', meta.title],
+        ['property', 'og:description', meta.description],
+        ['property', 'og:type', 'website'],
+        ['property', 'og:url', window.location.href],
+        ['property', 'og:image', 'https://umamiaudio.com/icon-512.png'],
+        ['property', 'og:image:alt', 'Umami Audio - Perfect Soup logo'],
+        ['property', 'og:site_name', 'Umami Audio'],
+        ['name', 'twitter:card', 'summary'],
+        ['name', 'twitter:title', meta.title],
+        ['name', 'twitter:description', meta.description],
+        ['name', 'twitter:image', 'https://umamiaudio.com/icon-512.png'],
+        ['name', 'description', meta.description],
+      ];
+      tags.forEach(function(t) {
+        var m = document.createElement('meta');
+        m.setAttribute(t[0], t[1]);
+        m.setAttribute('content', t[2]);
+        document.head.appendChild(m);
+      });
+
+      // Single Page Apps for GitHub Pages
+      // https://github.com/rafgraph/spa-github-pages
+      var pathSegmentsToKeep = 0;
+
+      var l = window.location;
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.hash
+      );
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
