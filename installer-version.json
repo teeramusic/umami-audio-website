@@ -1,0 +1,14 @@
+{
+  "major": 1,
+  "minor": 0,
+  "builds": {
+    "plugin_win": 265,
+    "plugin_mac": 262,
+    "wizard_win": 265,
+    "wizard_mac": 261,
+    "psd_win": 172,
+    "psd_mac": 155,
+    "installer_win": 313,
+    "installer_mac": 309
+  }
+}
