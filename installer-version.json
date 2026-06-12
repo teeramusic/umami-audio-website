@@ -1,0 +1,20 @@
+{
+  "major": 1,
+  "minor": 0,
+  "builds": {
+    "plugin_win": 293,
+    "plugin_mac": 282,
+    "wizard_win": 293,
+    "wizard_mac": 281,
+    "psd_win": 174,
+    "psd_mac": 155,
+    "installer_win": 341,
+    "installer_mac": 329
+  },
+  "grandmas_spice": {
+    "major": 1,
+    "minor": 0,
+    "win": 36,
+    "mac": 36
+  }
+}
