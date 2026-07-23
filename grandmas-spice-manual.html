@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- No page-level color-scheme (deliberate, matches manual.html): a `dark` root would make the
+     browser paint an OPAQUE canvas behind the transparent /embed/chat/ iframe (white box behind
+     the chat bubble in dark mode). Dark styling comes from the CSS variables below instead. -->
+<title>Grandma's Spice — User Manual | Umami Audio</title>
+<meta name="description" content="User manual for Grandma's Spice, the detail-preserving foldback clipper plugin by Umami Audio: controls, the three fold modes, the saturation section, EQs, and signal flow.">
+<link rel="icon" href="/favicon.ico">
+<style>
+  :root {
+    --color-primary: #0071E3;
+    --color-accent: #5E5CE6;
+    --color-bg: #FBFBFD;
+    --color-surface: #F2F2F7;
+    --color-surface-alt: #F7F7FA;
+    --color-text: #1D1D1F;
+    --color-text-secondary: #86868B;
+    --color-success: #34C759;
+    --color-warning: #FF9500;
+    --color-error: #FF3B30;
+    --color-border: #D2D2D7;
+    --color-border-subtle: #E8E8ED;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-primary: #3B6FA0;
+      --color-accent: #9B6EC6;
+      --color-bg: #1C1C1E;
+      --color-surface: #2C2C2E;
+      --color-surface-alt: #323234;
+      --color-text: #F5F5F7;
+      --color-text-secondary: #98989D;
+      --color-success: #30D158;
+      --color-warning: #FF9F0A;
+      --color-error: #FF453A;
+      --color-border: #38383A;
+      --color-border-subtle: #2E2E30;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.5;
+  }
+  a { color: var(--color-primary); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  a:focus-visible, button:focus-visible { outline: 1.5px solid var(--color-primary); outline-offset: 2px; border-radius: 4px; }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 48px 24px 64px; }
+
+  header.manual-head { margin-bottom: 40px; }
+  header.manual-head .eyebrow {
+    font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--color-text-secondary); margin-bottom: 8px;
+  }
+  header.manual-head h1 { font-size: 2.25rem; font-weight: 700; line-height: 1.2; }
+  header.manual-head h1 .spice-s { color: #66BB6A; }
+  header.manual-head h1 .spice-rest {
+    background: linear-gradient(90deg, #E53935, #B71C1C);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: #E53935;
+  }
+  header.manual-head p.sub { color: var(--color-text-secondary); font-size: 1.0625rem; margin-top: 8px; }
+  .backlink { display: inline-block; margin-bottom: 24px; font-size: 0.9375rem; }
+
+  nav.toc {
+    background: var(--color-surface); border: 1px solid var(--color-border);
+    border-radius: 12px; padding: 24px; margin-bottom: 40px;
+  }
+  nav.toc h2 { font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-text-secondary); margin-bottom: 12px; }
+  nav.toc ol { list-style: none; columns: 2; column-gap: 32px; }
+  nav.toc li { margin-bottom: 8px; break-inside: avoid; font-size: 0.9375rem; }
+  @media (max-width: 640px) { nav.toc ol { columns: 1; } }
+
+  section { margin-bottom: 48px; }
+  h2 { font-size: 1.5rem; font-weight: 700; line-height: 1.2; margin-bottom: 16px; padding-top: 8px; }
+  h3 { font-size: 1.125rem; font-weight: 600; line-height: 1.2; margin: 24px 0 8px; }
+  p { margin-bottom: 12px; }
+  p, li { color: var(--color-text); }
+  .muted { color: var(--color-text-secondary); }
+  ul, ol { margin: 0 0 12px 24px; }
+  li { margin-bottom: 6px; }
+  strong { font-weight: 600; }
+  kbd {
+    font-family: inherit; font-size: 0.8125rem; font-weight: 600;
+    background: var(--color-surface); border: 1px solid var(--color-border);
+    border-bottom-width: 2px; border-radius: 4px; padding: 1px 6px; white-space: nowrap;
+  }
+  .card {
+    background: var(--color-surface); border: 1px solid var(--color-border);
+    border-radius: 12px; padding: 24px; margin-bottom: 16px;
+  }
+  .note {
+    border-left: 3px solid var(--color-accent); background: var(--color-surface);
+    border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 16px 0;
+    font-size: 0.9375rem;
+  }
+  .note strong:first-child { color: var(--color-accent); }
+
+  .shot { border: 1px solid var(--color-border); border-radius: 12px; overflow: hidden; margin: 16px 0; }
+  .shot img { display: block; width: 100%; height: auto; }
+  .shot figcaption { padding: 10px 16px; font-size: 0.875rem; color: var(--color-text-secondary); border-top: 1px solid var(--color-border-subtle); }
+
+  .tbl-scroll { overflow-x: auto; margin: 16px 0; border: 1px solid var(--color-border); border-radius: 12px; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9375rem; }
+  th {
+    background: var(--color-surface); color: var(--color-text-secondary);
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    text-align: left; padding: 10px 16px; border-bottom: 1px solid var(--color-border);
+  }
+  td { padding: 10px 16px; border-bottom: 1px solid var(--color-border-subtle); vertical-align: top; }
+  tbody tr:nth-child(even) { background: var(--color-surface-alt); }
+  tbody tr:last-child td { border-bottom: none; }
+  td:first-child { white-space: nowrap; font-weight: 600; }
+
+  /* Signal-flow chain */
+  .flow { list-style: none; margin: 24px auto; max-width: 420px; padding: 0; }
+  .flow > li {
+    position: relative; text-align: center; border-radius: 8px; padding: 12px 16px;
+    margin: 0 0 28px; font-weight: 600; font-size: 0.9375rem;
+    background: var(--color-surface); border: 1.5px solid var(--color-text-secondary);
+  }
+  .flow > li:not(:last-child)::after {
+    content: ""; position: absolute; left: 50%; bottom: -24px; transform: translateX(-50%);
+    border-left: 7px solid transparent; border-right: 7px solid transparent;
+    border-top: 9px solid var(--color-border);
+  }
+  .flow > li:not(:last-child)::before {
+    content: ""; position: absolute; left: 50%; bottom: -20px; transform: translateX(-50%);
+    width: 2px; height: 16px; background: var(--color-border);
+  }
+  .flow > li small { display: block; font-weight: 400; font-size: 0.8125rem; color: var(--color-text-secondary); margin-top: 2px; }
+  .flow .f-gain    { border-color: var(--color-warning); color: var(--color-warning); }
+  .flow .f-eq      { border-color: var(--color-primary); color: var(--color-primary); }
+  .flow .f-fold    { background: var(--color-accent); border-color: var(--color-accent); color: #fff; }
+  .flow .f-sat     { border-color: var(--color-accent); color: var(--color-accent); }
+  .flow .f-brick   { border-color: var(--color-error); color: var(--color-error); }
+  .flow .f-fold small, .flow .f-fold { color: #fff; }
+  .flow .f-fold small { color: rgba(255,255,255,0.8); }
+
+  footer.manual-foot {
+    border-top: 1px solid var(--color-border-subtle); padding-top: 24px; margin-top: 16px;
+    font-size: 0.9375rem; color: var(--color-text-secondary);
+  }
+  footer.manual-foot .links { display: flex; flex-wrap: wrap; gap: 24px; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="backlink" href="/grandmas-spice">&larr; Back to Grandma&rsquo;s Spice</a>
+
+  <header class="manual-head">
+    <p class="eyebrow">Umami Audio &middot; User Manual</p>
+    <h1>Grandma&rsquo;s <span class="spice-s">S</span><span class="spice-rest">pice</span></h1>
+    <p class="sub">The detail-preserving foldback clipper &mdash; VST3 / AU / AAX, Windows &amp; macOS.</p>
+  </header>
+
+  <nav class="toc" aria-label="Contents">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#intro">1. Introduction</a></li>
+      <li><a href="#quickstart">2. Quick start</a></li>
+      <li><a href="#layout">3. Interface overview</a></li>
+      <li><a href="#main-controls">4. Main controls</a></li>
+      <li><a href="#fold-modes">5. The three fold modes</a></li>
+      <li><a href="#eq">6. The three EQs</a></li>
+      <li><a href="#saturation">7. The saturation section</a></li>
+      <li><a href="#scopes">8. Spectrum &amp; oscilloscope</a></li>
+      <li><a href="#signal-flow">9. Signal flow</a></li>
+      <li><a href="#gestures">10. Gestures &amp; shortcuts</a></li>
+      <li><a href="#tips">11. Tips</a></li>
+      <li><a href="#support">12. Support</a></li>
+    </ol>
+  </nav>
+
+  <section id="intro">
+    <h2>1. Introduction</h2>
+    <p>
+      Grandma&rsquo;s Spice is a clipper that refuses to throw detail away. Where a standard hard
+      clipper flattens everything above the threshold into a featureless plateau, Grandma&rsquo;s Spice
+      <strong>folds the overshoot back</strong> into the permitted range &mdash; reflecting it off the
+      threshold, as many times as it takes. High-frequency texture and transient detail riding on the
+      peaks survive, even when you push the input far past the rails.
+    </p>
+    <p>
+      Around that core sit a <strong>Delta</strong> control that sets how much folded detail is blended
+      back (with a dedicated EQ that shapes <em>only</em> the overshoot), a
+      <strong>four-flavour saturation pad</strong> (Linear, JFET, Op-Amp, Transformer), three 8-band
+      parametric EQs, oversampling up to 8&times;, and a live spectrum analyser and oscilloscope.
+    </p>
+  </section>
+
+  <section id="quickstart">
+    <h2>2. Quick start</h2>
+    <ol>
+      <li>Insert Grandma&rsquo;s Spice on a drum bus, synth, or full mix.</li>
+      <li>Lower <strong>Threshold</strong> until the meters and spectrum show clipping activity.</li>
+      <li>Raise <strong>Delta</strong> to bring folded detail back in; cut it for a harder, cleaner clip.</li>
+      <li>Click <strong>Fold Mode</strong> to audition the three fold shapes (see <a href="#fold-modes">section 5</a>).</li>
+      <li>Open the <strong>Saturation</strong> tab and drag the pad node toward JFET, Op-Amp, or Transformer for analog colour.</li>
+      <li>Balance the level with <strong>Output</strong>; raise <strong>Oversampling</strong> if you hear aliasing on bright material.</li>
+    </ol>
+  </section>
+
+  <section id="layout">
+    <h2>3. Interface overview</h2>
+    <figure class="shot">
+      <img src="/grandmas-spice-screenshot.webp" alt="Grandma's Spice plugin interface" width="1077" height="717">
+      <figcaption>The four-quadrant interface: drive controls and meters (top left), spectrum analyser (top right), EQ &amp; saturation tabs (bottom left), oscilloscope (bottom right).</figcaption>
+    </figure>
+    <p>The window is a fixed-size four-quadrant grid:</p>
+    <ul>
+      <li><strong>Top left</strong> &mdash; the main drive knobs (Input, Threshold, Output, Delta), Fold Mode button, oversampling selector, and stereo input/output meters.</li>
+      <li><strong>Top right</strong> &mdash; the spectrum analyser, overlaying the dry and processed signals.</li>
+      <li><strong>Bottom left</strong> &mdash; the tab strip: <strong>Input</strong>, <strong>Delta</strong>, and <strong>Output</strong> EQs plus the <strong>Saturation</strong> pad.</li>
+      <li><strong>Bottom right</strong> &mdash; the oscilloscope.</li>
+    </ul>
+    <p>
+      The <strong>Scopes</strong> button hides or shows the two analyser panels; with scopes hidden the
+      window collapses to a compact half-width layout. Hovering any control shows a tooltip explaining it.
+    </p>
+  </section>
+
+  <section id="main-controls">
+    <h2>4. Main controls</h2>
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Control</th><th>Range</th><th>Default</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Input</td><td>&minus;60 &hellip; +20 dB</td><td>0 dB</td>
+            <td>Input trim, applied before everything else. Drive it up to push the signal into the threshold.</td>
+          </tr>
+          <tr>
+            <td>Threshold</td><td>&minus;48 &hellip; 0 dB</td><td>0 dB</td>
+            <td>The clip/fold rail. Anything beyond &plusmn;Threshold is folded back inside. Lower = more folding. The knob&rsquo;s disc doubles as a VU-style gain meter comparing the signal after make-up gain against the signal after the input trim &mdash; the net gain the processing adds or removes.</td>
+          </tr>
+          <tr>
+            <td>Delta</td><td>&minus;60 &hellip; +36 dB</td><td>0 dB</td>
+            <td>How much of the folded overshoot (&ldquo;the detail&rdquo;) is blended back. At full cut you get a hard clip; at 0&nbsp;dB the fold is at unity; boosting drives extra overshoot into the fold for denser harmonics.</td>
+          </tr>
+          <tr>
+            <td>Output</td><td>&minus;60 &hellip; +20 dB</td><td>0 dB</td>
+            <td>Make-up gain after the Output EQ, just before the final brick-wall stage.</td>
+          </tr>
+          <tr>
+            <td>Fold Mode</td><td>Mode 1 / 2 / 3</td><td>Mode 1</td>
+            <td>Selects the fold shape (<a href="#fold-modes">section 5</a>). Click to advance; <kbd>Shift</kbd>-click or right-click to step back. Switching is click-free, so compare while audio runs.</td>
+          </tr>
+          <tr>
+            <td>Oversampling</td><td>1&times; / 2&times; / 4&times; / 8&times;</td><td>1&times;</td>
+            <td>Runs the clipper, fold, and saturation at a multiple of the session rate to suppress aliasing. Higher settings add a little latency (reported to the host) and CPU.</td>
+          </tr>
+          <tr>
+            <td>Meters</td><td colspan="2">&minus;72 &hellip; +12 dB</td>
+            <td>Stereo input and output peak meters flank the drive section; the region above 0&nbsp;dBFS is drawn in red. The input meter reads the signal just after the input trim; the output meter reads it just after make-up gain, before the final brick-wall stage.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note">
+      <strong>Knob gestures:</strong> drag vertically to turn; double-click a knob or its value box to
+      reset; scroll to step (faster spins take bigger steps, <kbd>Shift</kbd> for fine control); click
+      the value text to type an exact number. Input, Output, and Delta place 0&nbsp;dB at 12 o&rsquo;clock.
+    </div>
+  </section>
+
+  <section id="fold-modes">
+    <h2>5. The three fold modes</h2>
+    <p>The fold shape decides <em>how</em> the overshoot reflects off the threshold:</p>
+    <div class="card">
+      <h3 style="margin-top:0">Mode 1 &mdash; Triangle</h3>
+      <p style="margin-bottom:0">
+        The classic wave-folder zig-zag: the overshoot reflects with a sharp corner at the rail. The
+        brightest and most aggressive mode &mdash; dense upper harmonics, real bite. Great on drums and
+        anything that should cut.
+      </p>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Mode 2 &mdash; Sine</h3>
+      <p style="margin-bottom:0">
+        A smooth sinusoidal reflection &mdash; the folded peak lands exactly at the threshold with no
+        hard corner. Rounder, warmer harmonics that stay musical as you keep pushing the input.
+      </p>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">Mode 3 &mdash; Soft</h3>
+      <p style="margin-bottom:0">
+        The same sine fold, but blended over a soft-clip baseline with no hard clip corner anywhere
+        &mdash; and designed so that EQ&rsquo;ing the folded overshoot (the Delta EQ) never stamps an
+        audible edge onto the waveform. The smoothest, most transparent mode; ideal on the mix bus.
+      </p>
+    </div>
+    <p class="muted">
+      All three modes crossfade seamlessly when switched, so you can A/B them in real time.
+    </p>
+  </section>
+
+  <section id="eq">
+    <h2>6. The three EQs</h2>
+    <p>Three independent 8-band parametric EQs sit at different points in the chain:</p>
+    <ul>
+      <li><strong>Input</strong> &mdash; shapes the signal <em>before</em> it hits the threshold. Use it to pre-emphasise what you want the fold to chew on.</li>
+      <li><strong>Delta</strong> &mdash; the signature move: this EQ shapes <em>only the folded overshoot</em>, not the in-range signal. Brighten just the detail, or high-pass the fold so the low end clips cleanly while the top folds.</li>
+      <li><strong>Output</strong> &mdash; conventional post-EQ after the saturation stage, before make-up gain.</li>
+    </ul>
+    <p>
+      Each band offers Bell, Low/High Shelf, Low/High-pass (6&ndash;48 dB/oct), Notch, and Band-pass
+      types, 1&nbsp;Hz&ndash;96&nbsp;kHz frequency, &plusmn;24&nbsp;dB gain, and Q from 0.05 to 40.
+      Each strip has its own bypass.
+    </p>
+    <h3>Working the graph</h3>
+    <ul>
+      <li><strong>Drag a band handle</strong> to set frequency (horizontal) and gain (vertical).</li>
+      <li>The numeric fields below accept typed values &mdash; the frequency field understands <code>2200</code>, <code>2.2k</code>, or <code>2.2 kHz</code>, and the <strong>Note</strong> field accepts pitches like <code>G#5</code> (A4 = 440 Hz).</li>
+      <li><strong>Drag up/down on a field&rsquo;s caption</strong> to scrub its value (<kbd>Shift</kbd> = slower); double-click to reset; scroll to step.</li>
+      <li>The dB scale gutter on the left of the graph is a zoom control &mdash; drag or scroll it to change the visible dB range.</li>
+    </ul>
+  </section>
+
+  <section id="saturation">
+    <h2>7. The saturation section</h2>
+    <p>
+      The fourth tab holds the saturation pad: an XY surface whose corners are four saturator flavours.
+      The signal leaving the fold stage always passes through this blend. Drag the node anywhere on the
+      pad &mdash; its position sets the mix of the four corners, and each corner&rsquo;s live share is
+      shown as a percentage.
+    </p>
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Corner</th><th>Character</th></tr></thead>
+        <tbody>
+          <tr><td>Linear</td><td>Clean pass-through &mdash; the &ldquo;dry&rdquo; leg of the blend. The default position is 100% Linear.</td></tr>
+          <tr><td>JFET</td><td>Square-law transistor asymmetry: second-harmonic warmth that thickens as you drive it.</td></tr>
+          <tr><td>Op-Amp</td><td>Amplifier-stage rounding. In its normal mode the low end (below ~80 Hz) passes clean while the highs saturate; click its label to switch to <strong>Retro</strong>, which saturates the full band.</td></tr>
+          <tr><td>Transformer</td><td>Magnetic-core character: hysteresis &ldquo;memory,&rdquo; even-harmonic bias, and a gentle high-frequency roll-off.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Corner controls</h3>
+    <ul>
+      <li><strong>Click a corner label</strong> to cycle its state: JFET and Transformer step through normal &rarr; asymmetry-flip (inverts the harmonic bias) &rarr; bypassed; Op-Amp steps On &rarr; Retro &rarr; Bypass; Linear toggles on/off.</li>
+      <li>A bypassed corner&rsquo;s share is redistributed to its neighbours &mdash; the on-screen percentages always match what you hear.</li>
+      <li><strong>Double-click the pad</strong> to reset the whole section (node to Linear, all corners active).</li>
+      <li>The entire section can be bypassed from the Saturation tab&rsquo;s right-click menu.</li>
+    </ul>
+    <p class="muted">
+      All four corners are loudness-matched, so morphing between flavours doesn&rsquo;t jump in level,
+      and every state change is smoothed &mdash; no clicks.
+    </p>
+  </section>
+
+  <section id="scopes">
+    <h2>8. Spectrum &amp; oscilloscope</h2>
+    <h3>Spectrum analyser</h3>
+    <p>
+      Overlays two curves &mdash; the <strong>dry</strong> signal (after the Input EQ) and the
+      <strong>processed</strong> signal (after the final stage) &mdash; so you can see exactly what the
+      fold and saturation added or tamed.
+    </p>
+    <h3>Oscilloscope</h3>
+    <ul>
+      <li><strong>Drag horizontally</strong> to change the time window (5&ndash;500 ms); scroll to zoom.</li>
+      <li><strong>Auto level</strong> keeps the trace peak-normalised. Turn it off to set the vertical zoom yourself by dragging up/down.</li>
+    </ul>
+    <p class="muted">Both panels are display-only and can be hidden with the Scopes button to shrink the window.</p>
+  </section>
+
+  <section id="signal-flow">
+    <h2>9. Signal flow</h2>
+    <p>From input to output, the chain runs:</p>
+    <ol class="flow" aria-label="Signal flow from input to output">
+      <li class="f-gain">Input Gain<small>drive into the threshold &middot; input meter + VU reference tap right after this stage</small></li>
+      <li class="f-eq">Input EQ<small>8-band pre-shaping &middot; spectrum &ldquo;dry&rdquo; tap after this stage</small></li>
+      <li class="f-fold">Fold-Back Clipper<small>clip + fold per the fold mode; the Delta EQ &amp; Delta level shape the folded overshoot before it&rsquo;s blended back</small></li>
+      <li class="f-sat">Saturation Blend<small>XY mix of Linear / JFET / Op-Amp / Transformer</small></li>
+      <li class="f-eq">Output EQ<small>8-band post-shaping</small></li>
+      <li class="f-gain">Output Gain<small>make-up level &middot; output meter + VU tap right after this stage</small></li>
+      <li class="f-brick">Brick-Wall Clip<small>final bound at 0 dBFS &middot; spectrum &ldquo;processed&rdquo; and oscilloscope taps here</small></li>
+    </ol>
+    <p class="muted">
+      All meter and analyser taps are listen-only &mdash; they never feed back into the audio path. The
+      Threshold knob&rsquo;s VU readout is the level ratio between the output-gain tap and the
+      input-gain tap, so it reports the net gain of everything between them (it excludes the input trim
+      itself and the final brick-wall). With oversampling engaged, the entire chain above runs at the
+      elevated rate. There is no global dry/wet control &mdash; blending happens inside the Delta stage
+      and on the saturation pad, where the Linear corner acts as the clean leg.
+    </p>
+  </section>
+
+  <section id="gestures">
+    <h2>10. Gestures &amp; shortcuts</h2>
+    <div class="tbl-scroll">
+      <table>
+        <thead><tr><th>Gesture</th><th>Effect</th></tr></thead>
+        <tbody>
+          <tr><td>Drag</td><td>Turn knobs, move EQ handles, position the saturation node, zoom scopes.</td></tr>
+          <tr><td>Double-click</td><td>Reset a knob, EQ field, or the saturation pad to its default.</td></tr>
+          <tr><td>Scroll wheel</td><td>Step values; spin faster for coarser steps. Works on knobs, EQ fields, type/slope selectors, and scope zoom.</td></tr>
+          <tr><td><kbd>Shift</kbd> + drag / scroll</td><td>Fine adjustment.</td></tr>
+          <tr><td>Click value text</td><td>Type an exact value (frequency fields accept <code>2.2k</code> and note names like <code>G#5</code>).</td></tr>
+          <tr><td>Right-click / <kbd>Shift</kbd>-click Fold Mode</td><td>Step backward through the modes.</td></tr>
+          <tr><td>Click a saturation corner label</td><td>Cycle that corner&rsquo;s state (normal / flip or Retro / bypass).</td></tr>
+          <tr><td>Right-click the Saturation tab</td><td>Bypass the entire saturation section.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="tips">
+    <h2>11. Tips</h2>
+    <ul>
+      <li><strong>Start with Threshold, finish with Delta.</strong> Set the amount of clipping first, then dial the folded detail to taste &mdash; Delta is the character control.</li>
+      <li><strong>High-pass the Delta EQ</strong> around 200&ndash;300 Hz to keep the low end clipping cleanly while the mids and highs fold. This is the fastest route to &ldquo;loud but not mushy.&rdquo;</li>
+      <li><strong>Mode 3 for buses.</strong> When Grandma&rsquo;s Spice is the last stage on a mix, Mode 3 with a modest Delta keeps things transparent while still catching peaks.</li>
+      <li><strong>Watch the Threshold disc.</strong> Its VU-style readout shows the net gain of the processing (from after the input trim to after make-up gain) &mdash; aim near 0 dB for honest A/B comparisons.</li>
+      <li><strong>Oversample bright material.</strong> Folding generates high harmonics by design; 4&times; keeps them from aliasing back down on cymbals and distorted synths.</li>
+    </ul>
+  </section>
+
+  <section id="support">
+    <h2>12. Support</h2>
+    <p>
+      Questions, bug reports, or feature requests &mdash; we&rsquo;d love to hear from you:
+    </p>
+    <ul>
+      <li>Join the <a href="https://discord.gg/rFccT4ydHa" target="_blank" rel="noopener noreferrer">Umami Audio Discord</a></li>
+      <li>Email <a href="mailto:support@umamiaudio.com">support@umamiaudio.com</a></li>
+    </ul>
+  </section>
+
+  <footer class="manual-foot">
+    <div class="links">
+      <a href="/grandmas-spice">Grandma&rsquo;s Spice</a>
+      <a href="/">Umami Audio</a>
+      <a href="/faq">FAQ</a>
+    </div>
+    <p>&copy; Umami Audio. Grandma&rsquo;s Spice is a trademark of Umami Audio.</p>
+  </footer>
+
+</div>
+
+<script>
+// Support chat bubble — same widget as the main site, embedded as a transparent, same-origin
+// iframe (/embed/chat/). Because the manual shares the umamiaudio.com origin, the visitor's chat
+// session carries over between the site and the manual. The iframe is a small FAB-sized box while
+// closed (so the manual stays clickable) and grows when the panel opens; the framed page posts its
+// open/closed state up here so we can resize it. Mounted at idle so it never competes with the
+// manual's own render.
+(function() {
+  if (window.self !== window.top) return; // avoid a chat-in-chat if the manual is ever framed
+
+  var COLLAPSED = 112; // px box around the closed FAB (fits its focus ring + shadow)
+
+  function mount() {
+    if (document.getElementById('umami-chat-embed')) return;
+    var iframe = document.createElement('iframe');
+    iframe.id = 'umami-chat-embed';
+    iframe.src = '/embed/chat/';
+    iframe.title = 'Umami support chat';
+    iframe.setAttribute('loading', 'lazy');
+    iframe.style.cssText =
+      'position:fixed;bottom:0;right:0;width:' + COLLAPSED + 'px;height:' + COLLAPSED + 'px;' +
+      'border:0;background:transparent;z-index:2147483000;overflow:hidden;color-scheme:normal;';
+    document.body.appendChild(iframe);
+
+    var open = false;
+    function applySize() {
+      if (!open) {
+        iframe.style.width = COLLAPSED + 'px';
+        iframe.style.height = COLLAPSED + 'px';
+      } else if (window.innerWidth < 640) {
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+      } else {
+        // Corner box on wider screens so the rest of the manual stays interactive while chatting.
+        iframe.style.width = '420px';
+        iframe.style.height = Math.min(760, window.innerHeight) + 'px';
+      }
+    }
+
+    window.addEventListener('message', function(e) {
+      if (e.origin !== window.location.origin) return;
+      if (e.source !== iframe.contentWindow) return;
+      var d = e.data;
+      if (!d || d.source !== 'umami-chat-embed' || d.type !== 'state') return;
+      open = !!d.open;
+      applySize();
+    });
+    window.addEventListener('resize', function() { if (open) applySize(); }, { passive: true });
+  }
+
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(mount, { timeout: 2500 });
+  } else {
+    setTimeout(mount, 1200);
+  }
+})();
+</script>
+</body>
+</html>

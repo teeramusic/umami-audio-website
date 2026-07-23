@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script>(function(){var K='ua:chunkReloadAt',C='ua:chunkReloadN',W=1e4,M=3;function r(){try{var n=+(sessionStorage.getItem(C)||0),l=+(sessionStorage.getItem(K)||0);if(n>=M||Date.now()-l<W)return!1;sessionStorage.setItem(K,String(Date.now()));sessionStorage.setItem(C,String(n+1))}catch(e){return!1}return window.location.reload(),!0}window.__umamiChunkReload=r;addEventListener('error',function(e){var t=e&&e.target;if(!t||t===window||t.nodeType!==1)return;var u=t.src||t.href||'';('SCRIPT'===t.tagName||'LINK'===t.tagName)&&0===u.indexOf(location.origin+'/assets/')&&/\.(?:js|mjs|css)(?:$|\?)/.test(u)&&r()},!0);addEventListener('vite:preloadError',function(e){r()&&e&&e.preventDefault&&e.preventDefault()})})();</script>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- No page-level color-scheme: a `dark` root makes browsers paint an OPAQUE dark canvas for
+         the iframe (defeating transparency). The dark scheme is scoped to #root below instead. -->
+    <!-- Framed helper page for the support chat bubble; never a search result on its own. -->
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Umami Support Chat</title>
+    <link rel="preconnect" href="https://backend.umamiaudio.com" crossorigin />
+
+    <!-- Scoped to exactly what the chat widget needs (fetch/stream to the backend + inline
+         Vite boot script). Enforcement of who may frame this page is X-Frame-Options: SAMEORIGIN
+         at the edge — frame-ancestors in a <meta> CSP is ignored by browsers. -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://backend.umamiaudio.com wss://backend.umamiaudio.com; base-uri 'self'; form-action 'self' https://backend.umamiaudio.com; object-src 'none'">
+
+    <style>
+      /* Transparent so only the widget's FAB / panel paint through the host iframe. Set inline
+         (before the module + Tailwind load) so there is never a dark or white flash on load. */
+      html, body { margin: 0; background: transparent !important; }
+      /* A `color-scheme: dark` root canvas is painted OPAQUE by browsers, which would show as a
+         dark rectangle over the host page instead of transparency. Force the root scheme to
+         normal (!important beats index.css's `:root { color-scheme: dark }`) so the canvas stays
+         see-through, then re-assert dark ONLY on the widget subtree so its native controls and
+         scrollbars keep their dark styling. */
+      :root { color-scheme: normal !important; }
+      #root { background: transparent; color-scheme: dark; }
+    </style>
+    <script type="module" crossorigin src="/assets/embedChat-BH8nYxKO.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/react-vendor-BPa2DVh5.js">
+    <link rel="modulepreload" crossorigin href="/assets/XMarkIcon-DFekta1C.js">
+    <link rel="modulepreload" crossorigin href="/assets/ChatWidget-D3_hE6oP.js">
+    <link rel="stylesheet" crossorigin href="/assets/XMarkIcon-CJnxBWyH.css">
+    <link rel="stylesheet" crossorigin href="/assets/ChatWidget-Ds90-khn.css">
+  </head>
+  <body>
+    <noscript>Support chat requires JavaScript.</noscript>
+    <div id="root"></div>
+  </body>
+</html>

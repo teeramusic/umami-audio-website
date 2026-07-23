@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Umami Audio - Perfect Soup</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script type="text/javascript">
+      // Per-page social preview meta tags for GitHub Pages SPA
+      var SITE = 'https://umamiaudio.com';
+
+      var pageMeta = {
+        '/': {
+          title: 'Umami Audio - Perfect Soup MIMO Speaker Calibration',
+          description: 'Professional MIMO speaker and room calibration software. Measure, correct, and perfect your listening environment with GPU-accelerated optimization.',
+        },
+        '/how-it-works': {
+          title: 'How It Works - Umami Audio',
+          description: 'Learn how Perfect Soup uses MIMO optimization to calibrate your speakers and room. Before and after measurements, speaker groups, and multi-seat setups explained.',
+          ogImage: SITE + '/how-it-works-og.webp',
+          ogImageAlt: 'How Perfect Soup MIMO speaker calibration works — Umami Audio',
+          twitterCard: 'summary_large_image',
+          ogUrl: SITE + '/how-it-works',
+          ogImageWidth: '1200',
+          ogImageHeight: '630',
+        },
+        '/purchase': {
+          title: 'Purchase - Umami Audio',
+          description: 'Choose your Perfect Soup license tier. Project Studio, Platinum Studio, or The Perfect Soup — perpetual or subscription options for every studio.',
+        },
+        '/download': {
+          title: 'Download - Umami Audio',
+          description: 'Download Perfect Soup Calibration Wizard and Calibration Loader plugins for Windows and macOS. VST3, AU, and AAX formats.',
+        },
+        '/grandmas-spice': {
+          title: 'Grandma\'s Spice — Super spicy \"detail-preserving\" clipper | Umami Audio',
+          description: "Grandma's Spice is a detail-preserving clipper plugin featuring a unique \"infinity fold\" algorithm. Super spicy, highly recommended by Grandma.",
+          ogImage: SITE + '/grandmas-spice-screenshot.webp',
+          ogImageAlt: 'Grandma\'s Spice clipper plugin interface — Umami Audio',
+          twitterCard: 'summary_large_image',
+          ogUrl: SITE + '/grandmas-spice',
+        },
+        '/free-plugins': {
+          title: 'Grandma\'s Spice — Super spicy \"detail-preserving\" clipper | Umami Audio',
+          description: "Grandma's Spice is a detail-preserving clipper plugin featuring a unique \"infinity fold\" algorithm. Super spicy, highly recommended by Grandma.",
+          ogImage: SITE + '/grandmas-spice-screenshot.webp',
+          ogImageAlt: 'Grandma\'s Spice clipper plugin interface — Umami Audio',
+          twitterCard: 'summary_large_image',
+          ogUrl: SITE + '/grandmas-spice',
+        },
+        '/faq': {
+          title: 'FAQ - Umami Audio',
+          description: 'Frequently asked questions about Perfect Soup speaker calibration. Licensing, system requirements, measurement tips, and more.',
+        },
+        '/tos': {
+          title: 'Terms of Service - Umami Audio',
+          description: 'Umami Audio Terms of Service for Perfect Soup speaker calibration software.',
+        },
+        '/privacy': {
+          title: 'Privacy Policy - Umami Audio',
+          description: 'Umami Audio Privacy Policy. How we handle your data and protect your privacy.',
+        },
+      };
+
+      var path = window.location.pathname.replace(/\/+$/, '') || '/';
+      var meta = pageMeta[path] || pageMeta['/'];
+
+      var ogImage = meta.ogImage || SITE + '/icon-512.png';
+      var ogImageAlt = meta.ogImageAlt || 'Umami Audio - Perfect Soup logo';
+      var twitterCard = meta.twitterCard || 'summary';
+      var ogUrl = meta.ogUrl || window.location.href.split('#')[0];
+
+      document.title = meta.title;
+
+      // Inject OG and Twitter meta tags (crawler-visible before SPA redirect)
+      var tags = [
+        ['property', 'og:title', meta.title],
+        ['property', 'og:description', meta.description],
+        ['property', 'og:type', 'website'],
+        ['property', 'og:url', ogUrl],
+        ['property', 'og:image', ogImage],
+        ['property', 'og:image:alt', ogImageAlt],
+        ['property', 'og:site_name', 'Umami Audio'],
+        ['name', 'twitter:card', twitterCard],
+        ['name', 'twitter:title', meta.title],
+        ['name', 'twitter:description', meta.description],
+        ['name', 'twitter:image', ogImage],
+        ['name', 'twitter:image:alt', ogImageAlt],
+        ['name', 'description', meta.description],
+      ];
+
+      if (meta.ogImageWidth && meta.ogImageHeight) {
+        tags.push(['property', 'og:image:width', meta.ogImageWidth]);
+        tags.push(['property', 'og:image:height', meta.ogImageHeight]);
+      } else if (twitterCard === 'summary') {
+        tags.push(['property', 'og:image:width', '512']);
+        tags.push(['property', 'og:image:height', '512']);
+      }
+      tags.forEach(function(t) {
+        var m = document.createElement('meta');
+        m.setAttribute(t[0], t[1]);
+        m.setAttribute('content', t[2]);
+        document.head.appendChild(m);
+      });
+
+      // Single Page Apps for GitHub Pages
+      // https://github.com/rafgraph/spa-github-pages
+      var pathSegmentsToKeep = 0;
+
+      var l = window.location;
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.hash
+      );
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

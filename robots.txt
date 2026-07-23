@@ -1,0 +1,20 @@
+User-agent: archive.org_bot
+Disallow: /
+
+User-agent: ia_archiver
+Disallow: /
+
+User-agent: Arquivo-web-crawler
+Disallow: /
+
+User-agent: arquivo-web-crawler
+Disallow: /
+
+# AI / LLM crawlers are allowed so the site is discoverable in AI-powered
+# search and chat assistants. See llms.txt / llms-full.txt for a curated map.
+User-agent: *
+# Embedded-only marketing iframe (Calibration Loader hero) — not a standalone page.
+Disallow: /loader-preview/
+Allow: /
+
+Sitemap: https://umamiaudio.com/sitemap.xml

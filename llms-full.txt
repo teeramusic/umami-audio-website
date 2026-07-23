@@ -1,0 +1,145 @@
+# Umami Audio — Perfect Soup (full reference)
+
+> Umami Audio makes **Perfect Soup**, professional speaker and room calibration software for music production, mixing, and mastering. It measures how your speakers actually behave *in your specific room* from many listening positions, then uses GPU-accelerated MIMO (Multiple Input, Multiple Output) optimization to compute correction filters that fix room modes, speaker frequency response, crossovers, speaker-to-speaker timing, and early reflections. The result is applied in real time as a VST3/AU plugin (the "Calibration Loader") on your DAW monitor bus, so what you hear matches what is actually in the mix. Umami Audio also publishes **Grandma's Spice**, a free detail-preserving foldback clipper plugin.
+
+Website: https://umamiaudio.com
+Support: support@umamiaudio.com
+Community: https://discord.gg/rFccT4ydHa
+
+---
+
+## The problem Perfect Soup solves
+
+Every room adds its own acoustic signature: bass modes (standing waves) that build up in corners, reflections off walls and the desk that create comb filtering, and phase problems where main speakers hand off to subwoofers. Two studios with the same monitors can sound completely different. The result is that what you hear is not what is in your mix — you are effectively mixing blind.
+
+Perfect Soup measures how your speakers actually behave in your room, from multiple listening positions, then computes filters that correct the combined speaker + room response back to a flat, neutral target. What you hear becomes the truth.
+
+---
+
+## How it works
+
+Perfect Soup uses **MIMO (Multiple Input, Multiple Output)** optimization. Unlike single-channel room correction tools that treat each speaker independently, it models your entire system as a cohesive system of collaborating speakers. A GPU-accelerated optimizer runs iteratively across all speakers and all measurement positions simultaneously; each iteration refines the filters for every speaker group while accounting for how each correction affects the response at every listening position. It converges on a solution where corrections for one speaker are always aware of what every other speaker is doing.
+
+This is especially powerful for subwoofer integration: when a sub supports multiple speaker groups, the optimizer converges on a single coherent correction that works for all groups, rather than applying contradicting per-channel EQ. The result is tighter bass, seamless integration, and a wider sweet spot than single-channel approaches can achieve.
+
+### What gets corrected
+
+- **Room modes** — standing waves that cause boomy bass buildup and nulls at certain frequencies, neutralized without over-correcting.
+- **Speaker response** — each speaker's frequency response is flattened so all speakers sound matched and neutral.
+- **Crossover alignment** — timing and phase alignment where mains hand off to subwoofers.
+- **Early reflections** — sound bouncing off nearby walls, desk, and console that colors the response.
+- **Speaker-to-speaker timing** — per-group delay alignment so distance differences don't smear imaging.
+- **MIMO cross-speaker coherence** — globally optimal corrections across all speakers, even when they share subwoofers.
+
+### Design principles
+
+- **Room + speaker correction** — corrects room modes and early reflections in addition to response linearization.
+- **Automatic crossover parameterization** — aligns phase, timing, and level between mains and subs.
+- **Distortion-aware optimization** — analyzes each speaker's distortion profile and shapes corrections that minimize distortion rather than blindly flattening response.
+- **Zero-assumption / zero-prior design** — makes no assumptions about your room or speakers; every correction is data-driven end to end.
+- **Multi-seat optimization** — optimizes for every seat (engineer, producer, client) so every position sounds accurate.
+- **Seamless integration** — applies as a VST/AU plugin in your DAW with auto render bypass; no workflow changes or extra hardware.
+
+---
+
+## Speaker groups
+
+A **speaker group** is the set of physical speakers that together reproduce one channel of audio. Each group maps to one input channel of the Calibration Loader plugin.
+
+- Every group has a **primary speaker** — the main monitor responsible for that channel.
+- A group can also have one or more **support speakers** — typically subwoofers that handle low frequencies the primary can't reproduce well.
+- Perfect Soup optimizes each group as a unit: it manages the crossover between primary and support speakers, aligns timing, balances levels, and corrects the combined frequency response, while accounting for how the room affects each speaker differently.
+- A subwoofer can be a support speaker in multiple groups. In a stereo setup with one sub, that sub appears as a support in both the Left and Right groups; Perfect Soup handles the shared sub without applying contradicting corrections.
+
+### Example configurations
+
+- **Stereo + Sub (2.1)** — 2 groups (Left, Right); the sub is a support in both. Optimizes the crossover between each main and the sub.
+- **Stereo + Dual Subs (2.2)** — 2 groups, each with two subs as supports. The solver optimizes both crossovers and the interaction between the two subs for coherent low-frequency reproduction across the listening area.
+- **5.1 Surround** — 6 groups (L, R, C, LS, RS, LFE). The sub is shared as a support across the five main groups and is the primary in the LFE group.
+- **5.1 Full Cross-Support** — every speaker supports every other speaker's group, letting the optimizer use all transducers; particularly effective in small rooms where all speakers interact acoustically.
+- **7.1.4 Immersive** — 12 groups covering ear-level, height, and LFE channels. Requires The Perfect Soup tier.
+
+---
+
+## Measurement
+
+The Calibration Wizard plays a test sweep through each speaker, one at a time, while a measurement microphone captures how the sound arrives at the listening position. You repeat this at **30 to 100 positions** around your listening area. More positions give the optimizer a better picture of the spatial variation in your room, producing corrections that work across a wider sweet spot rather than a single exact point.
+
+Mic positions should be spread around where you sit — left, right, forward, backward, and at multiple heights. The averaged center of all positions becomes your acoustic focal point.
+
+**Multi-seat, multi-sub setups:** In a production studio the engineer and clients often sit at different positions. Perfect Soup measures both seats and optimizes corrections that work across the entire listening zone. With a 2.4 configuration (stereo mains + four subs), the optimizer uses all four subs to cancel room modes more effectively than a single sub could; corner placement couples each sub to two room boundaries for maximum modal control. Each seat gets its own cluster of measurement positions, and the solver minimizes error at all locations simultaneously.
+
+---
+
+## Workflow
+
+1. **Measure** — Run the Calibration Wizard. It plays test sweeps through each speaker and records the result with your measurement mic at multiple positions.
+2. **Upload** — The wizard packages all measurements and uploads them to the Umami Audio cloud. You can name and manage measurements from your dashboard.
+3. **Process** — The GPU-accelerated MIMO engine analyzes every measurement and computes optimal filters for each speaker group via iterative optimization.
+4. **Apply** — Select your calibration in the Calibration Loader plugin on your DAW monitor bus.
+
+The whole process takes about an hour.
+
+### Signal flow in your DAW
+
+The Calibration Loader plugin sits on your monitor bus. Each DAW output channel feeds into a speaker group, which applies the computed filter (EQ, delay, gain, crossover) and routes the corrected signal to the appropriate physical outputs — primary and support speakers.
+
+---
+
+## Requirements
+
+- A measurement microphone (any calibration mic works).
+- An audio interface with the mic input and speaker outputs on the same device.
+- A computer running **Windows 10 or later** or **macOS 11 (Big Sur) or later** (Intel or Apple Silicon).
+- Plugin formats: VST3 and AU (AAX support in progress).
+
+---
+
+## Licensing and pricing
+
+License tiers determine how many speaker groups and support speakers per group your license allows:
+
+| Tier | Speaker groups | Supports / group | Ideal for |
+|------|----------------|------------------|-----------|
+| Project Studio | Up to 2 | 1 | Stereo + 1 subwoofer |
+| Platinum Studio | Up to 6 | 4 | 5.1 surround, stereo with multiple subs |
+| The Perfect Soup | Unlimited | Unlimited | 7.1.4 Atmos, complex multi-sub arrays |
+
+- A **support** is a supporting speaker within a group (e.g. a sub in a stereo-plus-sub pair counts as one support).
+- **Calibration access:** Perpetual licenses include 1 year of calibration access. Rent-to-own plans include calibration as part of the monthly fee. A standalone calibration extension is available ($49 for 30 days or $69 for 365 days).
+- **Upgrades:** Perpetual license holders can upgrade to a higher tier anytime.
+- **Updates:** All license holders receive free lifetime software updates for as long as Umami Audio continues developing Perfect Soup.
+- **License transfer:** Perpetual licenses can be transferred to another user for a $20 fee.
+- **Refunds:** Full refund available within 14 days of purchase (or any longer period required by local consumer-protection law) via support@umamiaudio.com. The free 60-day trial is the recommended way to evaluate before buying.
+- **Free trial:** Perfect Soup offers a free 60-day trial with full access — unlimited speaker groups and supports, no credit card required.
+
+For current pricing and plans, see https://umamiaudio.com/purchase.
+
+---
+
+## Grandma's Spice (free plugin)
+
+Grandma's Spice is a free **detail-preserving clipper** plugin for Windows and macOS (VST3 / AU).
+
+When you clip a signal hard enough, the peaks get flattened into something resembling a square wave, and any intricate detail riding on those peaks — high-frequency harmonics, transient texture — gets flattened along with it. Unlike a standard hard clipper, Grandma's Spice uses a **foldback technique**: signals that exceed the threshold are reflected back into the permitted range, and if a reflection crosses the threshold on the opposite polarity it is simply reflected again, as many times as needed. The waveform stays inside the limits while preserving harmonic detail a standard hard clipper would destroy — so you can keep pushing for an ultra-hot, "spicy" sound.
+
+The idea originated from au5_official and tomfinster; Grandma's Spice takes it further with the infinite-foldback approach.
+
+Signal chain: Input → Input Meter → Input Gain → Input EQ → Fold-Back Clipper (with a fold-back delta EQ & gain branch that sums back into the main path) → Output Gain → Output EQ → Output Meter → Regular Clipper → Output.
+
+Download: https://umamiaudio.com/grandmas-spice
+
+---
+
+## Links
+
+- Home: https://umamiaudio.com/
+- How It Works: https://umamiaudio.com/how-it-works
+- Purchase: https://umamiaudio.com/purchase
+- Download: https://umamiaudio.com/download
+- Grandma's Spice: https://umamiaudio.com/grandmas-spice
+- FAQ: https://umamiaudio.com/faq
+- Terms of Service: https://umamiaudio.com/tos
+- Privacy Policy: https://umamiaudio.com/privacy
+- Support: support@umamiaudio.com
+- Discord: https://discord.gg/rFccT4ydHa

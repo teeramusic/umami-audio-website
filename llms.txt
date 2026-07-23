@@ -1,0 +1,35 @@
+# Umami Audio — Perfect Soup
+
+> Umami Audio makes **Perfect Soup**, professional speaker and room calibration software for music production, mixing, and mastering. It measures how your speakers actually behave in your room from many listening positions, then uses GPU-accelerated MIMO (Multiple Input, Multiple Output) optimization to compute correction filters that fix room modes, speaker response, crossovers, timing, and early reflections. The calibration is applied as a VST3/AU plugin (the "Calibration Loader") on your DAW monitor bus. Umami Audio also publishes **Grandma's Spice**, a free detail-preserving foldback clipper plugin.
+
+## Key facts
+
+- Product: Perfect Soup — speaker + room calibration, from stereo to 7.1.4 Atmos and beyond.
+- Workflow: Measure (Calibration Wizard plays sweeps, mic records 30–100 positions) → Upload to the Umami Audio cloud → Process (GPU MIMO solver) → Apply (Calibration Loader VST3/AU plugin on the DAW monitor bus).
+- Platforms: Windows 10+ and macOS 11+ (Intel and Apple Silicon). Plugin formats: VST3, AU (AAX in progress).
+- Free 60-day trial: full access, no credit card required.
+- Hardware needed: a measurement microphone and an audio interface with mic input and speaker outputs on the same device.
+
+## Pages
+
+- [Home](https://umamiaudio.com/): Overview of Perfect Soup, the problem it solves, and core features.
+- [How It Works](https://umamiaudio.com/how-it-works): Speaker groups, primary vs. support speakers, example configurations (2.1, 2.2, 5.1, 7.1.4), measurement, signal flow, MIMO optimization, and what gets corrected.
+- [Purchase](https://umamiaudio.com/purchase): License tiers (Project Studio, Platinum Studio, The Perfect Soup) and calibration-access plans.
+- [Download](https://umamiaudio.com/download): Installers for Windows and macOS.
+- [Grandma's Spice](https://umamiaudio.com/grandmas-spice): Free detail-preserving foldback clipper plugin (VST3/AU, Windows + macOS).
+- [FAQ](https://umamiaudio.com/faq): Equipment, supported speaker counts, subwoofers, licensing, upgrades, and calibration access.
+
+## Concepts
+
+- **Speaker group**: the set of physical speakers that together reproduce one audio channel; maps to one input channel of the Calibration Loader plugin. Each group has one primary speaker and zero or more support speakers (typically subwoofers).
+- **Support speaker**: a supporting transducer in a group (often a sub). A single sub can be a support in multiple groups; the solver applies one coherent correction across them.
+- **MIMO optimization**: the GPU-accelerated solver corrects all speakers and measurement positions simultaneously so corrections are globally consistent rather than per-channel.
+- **Calibration Wizard**: the measurement app that plays test sweeps per speaker and captures the room response at many mic positions.
+- **Calibration Loader**: the VST3/AU plugin that loads a finished calibration and applies per-group EQ, delay, gain, and crossover on the monitor bus.
+
+## Optional
+
+- [Terms of Service](https://umamiaudio.com/tos)
+- [Privacy Policy](https://umamiaudio.com/privacy)
+- [Support](mailto:support@umamiaudio.com)
+- [Discord community](https://discord.gg/rFccT4ydHa)
