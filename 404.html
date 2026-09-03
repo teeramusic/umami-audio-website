@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Umami Audio - Perfect Soup</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- This document is also copied to <dir>.html for every directory without a page of its own
+         (scripts/deploy-frontend.sh, bare-directory stubs), where GitHub Pages serves it with a
+         200. Without this a crawler would index /gear, /assets, … as a copy of the landing page's
+         meta at the wrong URL. Served as the real 404 handler the tag changes nothing. -->
+    <meta name="robots" content="noindex">
+    <script type="text/javascript">
+      // Social preview meta for a URL GitHub Pages has no file for, before the SPA bounce below.
+      //
+      // ONE ENTRY, AND THAT IS DELIBERATE. Every route in src/routeTable.js — the twenty
+      // prerendered pages, the ten skeleton shells and the four aliases — now has a real HTML file
+      // of its own with its real <head> (scripts/prerender.mjs and scripts/skeletonShells.mjs
+      // write both `<route>/index.html` and the extension-less sibling), so none of them is ever
+      // served from here. This file is reached only by a URL that matches nothing: a stale deep
+      // link, a typo, a crawler guessing. There is no per-page copy to give such a URL, and the
+      // per-route strings that used to sit here had drifted from the real pages' meta anyway —
+      // stale titles and descriptions offered to any crawler that did reach them.
+      //
+      // src/routeTable.test.mjs asserts every key here is still a real route path, so a future
+      // entry cannot be added for a route that no longer exists.
+      var SITE = 'https://umamiaudio.com';
+
+      var pageMeta = {
+        '/': {
+          title: 'Umami Audio - Perfect Soup MIMO Speaker Calibration',
+          description: 'Professional MIMO speaker and room calibration software. Measure, correct, and perfect your listening environment with GPU-accelerated optimization.',
+        },
+      };
+
+      var path = window.location.pathname.replace(/\/+$/, '') || '/';
+      var meta = pageMeta[path] || pageMeta['/'];
+
+      var ogImage = meta.ogImage || SITE + '/icon-512.png';
+      var ogImageAlt = meta.ogImageAlt || 'Umami Audio - Perfect Soup logo';
+      var twitterCard = meta.twitterCard || 'summary';
+      var ogUrl = meta.ogUrl || window.location.href.split('#')[0];
+
+      document.title = meta.title;
+
+      // Inject OG and Twitter meta tags (crawler-visible before SPA redirect)
+      var tags = [
+        ['property', 'og:title', meta.title],
+        ['property', 'og:description', meta.description],
+        ['property', 'og:type', 'website'],
+        ['property', 'og:url', ogUrl],
+        ['property', 'og:image', ogImage],
+        ['property', 'og:image:alt', ogImageAlt],
+        ['property', 'og:site_name', 'Umami Audio'],
+        ['name', 'twitter:card', twitterCard],
+        ['name', 'twitter:title', meta.title],
+        ['name', 'twitter:description', meta.description],
+        ['name', 'twitter:image', ogImage],
+        ['name', 'twitter:image:alt', ogImageAlt],
+        ['name', 'description', meta.description],
+      ];
+
+      if (meta.ogImageWidth && meta.ogImageHeight) {
+        tags.push(['property', 'og:image:width', meta.ogImageWidth]);
+        tags.push(['property', 'og:image:height', meta.ogImageHeight]);
+      } else if (twitterCard === 'summary') {
+        tags.push(['property', 'og:image:width', '512']);
+        tags.push(['property', 'og:image:height', '512']);
+      }
+      tags.forEach(function(t) {
+        var m = document.createElement('meta');
+        m.setAttribute(t[0], t[1]);
+        m.setAttribute('content', t[2]);
+        document.head.appendChild(m);
+      });
+
+      // Single Page Apps for GitHub Pages
+      // https://github.com/rafgraph/spa-github-pages
+      var pathSegmentsToKeep = 0;
+
+      var l = window.location;
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.hash
+      );
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
